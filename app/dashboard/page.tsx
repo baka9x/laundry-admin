@@ -1,6 +1,5 @@
-import LoginForm from "@/components/user/Login";
 
-export default function Home() {
+export default function DashboardPage() {
   return (
     <div className="flex">
       <div className="flex-1">
