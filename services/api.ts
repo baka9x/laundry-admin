@@ -11,7 +11,7 @@ export const api = axios.create({
 });
 
 if (typeof window !== 'undefined') {
-  const token = Cookies.get("token") || localStorage.getItem('token');
+  const token = Cookies.get("token");
   if (token) {
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   }

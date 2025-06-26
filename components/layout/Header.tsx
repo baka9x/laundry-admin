@@ -3,9 +3,19 @@ import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import { FRONTEND_URL } from '@/config/variables';
 import { FaSearch, FaBell, FaUserCircle } from 'react-icons/fa';
+import { HiOutlineLogout } from "react-icons/hi";
+import { useState } from 'react';
+import { User } from '@/types/user';
 
-export default function Header() {
+interface HeaderProps {
+    data: User;
+}
+
+const Header: React.FC<HeaderProps> = ({ data }) => {
+    const [username, setUsername] = useState(data.username);
+    const [role, setRole] = useState(data.role)
     const router = useRouter();
+
     function handleLogout() {
         Cookies.remove('token');
         router.push('/login');
@@ -30,15 +40,18 @@ export default function Header() {
                 <div className="flex items-center gap-3 cursor-pointer">
                     <FaUserCircle className="text-[#f5f5f5] text-4xl" />
                     <div className="flex flex-col items-start">
-                        <h1 className="text-md text-[#f5f5f5] font-semibold">Baka9x</h1>
-                        <p className="text-xs text-[#ababab]">Admin</p>
-                        <button onClick={handleLogout} className="text-sm text-[#f5f5f5] hover:underline">
-                            Đăng xuất
-                        </button>
+                        <h1 className="text-md text-[#f5f5f5] font-semibold">{username}</h1>
+                        <p className="text-xs text-[#ababab]">{role}</p>
                     </div>
+                    <button onClick={handleLogout} className="text-sm cursor-pointer">
+                        <HiOutlineLogout className="text-[#f5f5f5] text-2xl hover:text-red-500" />
+                        <span className="sr-only">Logout</span>
+                    </button>
                 </div>
             </div>
 
         </header>
     );
 }
+
+export default Header;
