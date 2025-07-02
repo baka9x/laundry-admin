@@ -11,3 +11,32 @@ export interface Customer {
     created_at: string;
     updated_at: string;
 }
+
+export interface CustomerInput {
+    name: string;
+    phone: string;
+    address: string;
+}
+
+export interface CustomersResponse {
+    data: Customer[];
+    limit: number;
+    page: number;
+    total: number;
+    total_pages: number;
+}
+
+export interface NewCustomerResponse {
+    customer_id: number;
+    customer_name: string;
+    customer_phone: string;
+    customer_address: string;
+    message: string;
+    status: string;
+    priority_level: number;
+    total_washes: number;
+    note: string | null;
+    created_at: string;
+    updated_at: string;
+    error?: string; 
+}

@@ -13,3 +13,11 @@ export interface AuthResponse {
   token: string;
   user_id: string;
 }
+
+export interface UsersResponse {
+  data: User[];
+  limit: number;
+  page: number;
+  total: number;
+  total_pages: number;
+}

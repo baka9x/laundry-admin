@@ -1,15 +1,9 @@
+import { CustomersResponse } from "@/types/customer";
 import Link from "next/link";
 import React from "react";
 
 type PopularCustomersProps = {
-  data: {
-    index: number;
-    name: string;
-    phoneNumber: string;
-    totalWashes: number;
-    totalSpent: number;
-    lastWashDate: string;
-  }[];
+  data: CustomersResponse;
 };
 
 const PopularCustomers: React.FC<PopularCustomersProps> = ({ data }) => {
@@ -30,10 +24,10 @@ const PopularCustomers: React.FC<PopularCustomersProps> = ({ data }) => {
      
 
       <div className="mt-4 px-6 overflow-y-scroll h-[300px]">
-        {data.map((item, index) => (
+        {data.data.map((item, index) => (
           <div key={index} className="flex items-center gap-5 mb-3">
             <button className="bg-[#f6b100] text-[#f5f5f5] p-3 text-xl font-bold rounded-lg">
-              #{item.index}
+              #{index}
             </button>
             <div className="flex items-center justify-between w-[100%]">
               <div className="flex flex-col items-start gap-1">
@@ -41,18 +35,18 @@ const PopularCustomers: React.FC<PopularCustomersProps> = ({ data }) => {
                   {item.name}
                 </h3>
                 <p className="text-[#ababab] text-sm">
-                  Số điện thoại: {item.phoneNumber}
+                  Số điện thoại: {item.phone}
                 </p>
               </div>
               <div className="flex flex-col items-start gap-2">
                 <p className="text-[#ababab] text-sm">
-                  Tổng lượt giặt: {item.totalWashes}
+                  Tổng lượt giặt: {item.total_washes}
                 </p>
                 <p className="text-[#ababab] text-sm">
-                  Tổng chi tiêu: {item.totalSpent} VNĐ
+                  Tổng chi tiêu: {item.total_spent} VNĐ
                 </p>
                 <p className="text-[#ababab] text-sm">
-                  Lần giặt gần nhất: {item.lastWashDate}
+                  Lần giặt gần nhất: {item.last_wash_date}
                 </p>
               </div>
             </div>

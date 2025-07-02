@@ -2,6 +2,7 @@ import "./globals.css";
 import { User } from "@/types/user";
 import { getUserProfile } from "@/services/user";
 import Header from "@/components/layout/Header";
+import { Toaster } from "react-hot-toast";
 
 export default async function RootLayout({
   children,
@@ -19,6 +20,7 @@ export default async function RootLayout({
       <body className="bg-gray-100 text-gray-900">
         <Header data={user} />
         {children}
+        <Toaster position="top-center" reverseOrder={false} />
       </body>
     </html>
   );

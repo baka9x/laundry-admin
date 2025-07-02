@@ -32,14 +32,14 @@ export default function Dropdown({ label, options, onSelect }: DropdownProps) {
     <div className="relative inline-block text-left" ref={dropdownRef}>
       <button
         onClick={() => setOpen(!open)}
-        className="inline-flex justify-between items-center px-3 py-1 text-[#ababab] text-md bg-[#383838] border border-gray-300 rounded-lg w-40 hover:bg-[#1f1f1f]"
+        className="inline-flex justify-between items-center px-3 py-1 text-[#f5f5f5] text-md bg-[#1f1f1f] border border-[#333] rounded-lg w-40 hover:bg-[#1a1a1a]"
       >
         {label}
         <FaChevronDown className="ml-2 text-sm" />
       </button>
 
       {open && (
-        <ul className="absolute z-10 mt-2 w-40 bg-[#383838] border text-[#ababab] border-gray-200 rounded-lg shadow-lg">
+        <ul className="absolute z-10 mt-2 w-40 bg-[#1f1f1f] border text-[#f5f5f5] border-[#333] rounded-lg shadow-lg">
           {options.map((option) => (
             <li
               key={option.value}

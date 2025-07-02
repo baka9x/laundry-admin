@@ -3,7 +3,11 @@ import MiniCard from "@/components/home/MiniCard";
 import PopularCustomers from "@/components/home/PopularCustomers";
 import RecentTransactions from "@/components/home/RecentTransactions";
 import BottomNav from "@/components/layout/BottomNav";
+import { getCustomers } from "@/services/customer";
+import { getOrders } from "@/services/order";
 import { getUserProfile } from "@/services/user";
+import { CustomersResponse } from "@/types/customer";
+import { OrdersResponse } from "@/types/order";
 import { User } from "@/types/user";
 import { BsCashCoin } from "react-icons/bs";
 import { GrInProgress } from "react-icons/gr";
@@ -116,13 +120,22 @@ const dataTransactions = [
 
 export default async function Home() {
   let user: User = {} as User;
+  let ordersResponse : OrdersResponse;
+  let customersResponse: CustomersResponse;
   try {
     user = await getUserProfile(true);
-  } catch (error) {
-    console.log("User not logged in or error:", error);
-  }
+    ordersResponse = await getOrders(true, {
+      status: "",
+      date: "",
+      page: 1,
+      limit: 15
+    })
 
-  return (
+    customersResponse = await getCustomers(true);
+
+
+
+    return (
     // h-[calc(100vh-5rem)]
     <section className="flex flex-col md:flex-row gap-4 px-4 py-6 mb-20">
       {/* Main Content (left) */}
@@ -133,37 +146,25 @@ export default async function Home() {
             <MiniCard data={dataTotalEarnings} />
             <MiniCard data={dataInProgress} />
           </div>
-
-          <RecentTransactions data={dataTransactions}/>
+         <RecentTransactions data={ordersResponse}/>
+          
         </div>
       </div>
 
       {/* Sidebar (right) */}
       <div className="w-full md:w-1/3">
         <div className="bg-[#1f1f1f] p-4 rounded-lg shadow">
-           <PopularCustomers data={dataPopularCustomers} />
+           <PopularCustomers data={customersResponse} />
         </div>
       </div>
 
      <BottomNav />
     </section>
 
-   
-    // <section className="bg-[#1f1f1f] h-full md:h-[calc(100vh-5rem)] overflow-hidden flex gap-3">
-    //   {/* Left div */}
-    //   <div className="flex flex-col gap-6 flex-1">
-    //     <Greetings data={user} />
-    //     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-4">
-    //       <MiniCard data={dataTotalEarnings} />
-    //       <MiniCard data={dataInProgress} />
-    //     </div>
-    //    <RecentTransactions data={dataTransactions}/>
-
-    //   </div>
-    //   {/* Right div */}
-    //   <div className="w-full md:w-[35%]">
-    //     <PopularCustomers data={dataPopularCustomers} />
-    //   </div>
-    // </section>
   );
+  } catch (error) {
+    console.log("User not logged in or error:", error);
+  }
+
+  
 }

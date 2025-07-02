@@ -1,4 +1,4 @@
-import { LoginCredentials, User } from '@/types/user';
+import { LoginCredentials, User, UsersResponse } from '@/types/user';
 import {api} from './api'
 import { getServerToken, serverApi } from './serverApi';
 
@@ -17,3 +17,8 @@ export const getUserProfile = async (isServer = false): Promise<User> => {
     return res.data;
   }
 };
+
+export const getUsers = async (): Promise<UsersResponse> => {
+  const response = await api.get('/auth/users');
+  return response.data;
+}
