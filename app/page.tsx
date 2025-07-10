@@ -4,10 +4,10 @@ import PopularCustomers from "@/components/home/PopularCustomers";
 import RecentTransactions from "@/components/home/RecentTransactions";
 import BottomNav from "@/components/layout/BottomNav";
 import { getCustomers } from "@/services/customer";
-import { getOrders } from "@/services/order";
+import { getWashOrders } from "@/services/washOrder";
 import { getUserProfile } from "@/services/user";
 import { CustomersResponse } from "@/types/customer";
-import { OrdersResponse } from "@/types/order";
+import { WashOrdersResponse } from "@/types/washOrder";
 import { User } from "@/types/user";
 import { BsCashCoin } from "react-icons/bs";
 import { GrInProgress } from "react-icons/gr";
@@ -30,101 +30,13 @@ const dataInProgress = {
   footerNum: 10,
 };
 
-const dataPopularCustomers = [
-  {
-    index: 1,
-    name: "Nguyễn Văn A",
-    phoneNumber: "0123456789",
-    totalWashes: 5,
-    totalSpent: 5000000,
-    lastWashDate: "2023-10-01",
-  },
-  {
-    index: 2,
-    name: "Nguyễn Văn B",
-    phoneNumber: "0123456789",
-    totalWashes: 5,
-    totalSpent: 5000000,
-    lastWashDate: "2023-10-01",
-  },
-  {
-    index: 3,
-    name: "Nguyễn Văn C",
-    phoneNumber: "0123456789",
-    totalWashes: 5,
-    totalSpent: 5000000,
-    lastWashDate: "2023-10-01",
-  },
-  {
-    index: 4,
-    name: "Nguyễn Văn D",
-    phoneNumber: "0123456789",
-    totalWashes: 5,
-    totalSpent: 5000000,
-    lastWashDate: "2023-10-01",
-  },
-  {
-    index: 5,
-    name: "Nguyễn Văn E",
-    phoneNumber: "0123456789",
-    totalWashes: 5,
-    totalSpent: 5000000,
-    lastWashDate: "2023-10-01",
-  },
-];
-
-const dataTransactions = [
-  {
-    index: 1,
-    orderId: "12345",
-    phoneNumber: "0900999999",
-    status: "Đã hoàn thành",
-    note: "Sẵn sàng để giao",
-  },
-  {
-    index: 2,
-    orderId: "67890",
-    phoneNumber: "0900888888",
-    status: "Đang xử lý",
-    note: "Chờ thanh toán",
-  },
-  {
-    index: 3,
-    orderId: "54321",
-    phoneNumber: "0900777777",
-    status: "Đã hủy",
-    note: "Khách từ chối nhận",
-  },
-  {
-    index: 4,
-    orderId: "54321",
-    phoneNumber: "0900777777",
-    status: "Đã hủy",
-    note: "Khách từ chối nhận",
-  },
-  {
-    index: 5,
-    orderId: "54321",
-    phoneNumber: "0900777777",
-    status: "Đã hủy",
-    note: "Khách từ chối nhận",
-  },
-  {
-    index: 6,
-    orderId: "54321",
-    phoneNumber: "0900777777",
-    status: "Đã hủy",
-    note: "Khách từ chối nhận",
-  },
-];
-
 export default async function Home() {
   let user: User = {} as User;
-  let ordersResponse : OrdersResponse;
+  let ordersResponse : WashOrdersResponse;
   let customersResponse: CustomersResponse;
   try {
     user = await getUserProfile(true);
-    ordersResponse = await getOrders(true, {
+    ordersResponse = await getWashOrders(true, {
       status: "",
       date: "",
       page: 1,
@@ -132,9 +44,6 @@ export default async function Home() {
     })
 
     customersResponse = await getCustomers(true);
-
-
-
     return (
     // h-[calc(100vh-5rem)]
     <section className="flex flex-col md:flex-row gap-4 px-4 py-6 mb-20">

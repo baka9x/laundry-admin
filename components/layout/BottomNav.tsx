@@ -9,9 +9,11 @@ import { RiDrinks2Fill } from "react-icons/ri";
 import clsx from "clsx";
 import { useState } from "react";
 import CreateOrderDialog from "../wash-order/CreateOrderDialog";
+import WashOrderDetail from "../wash-order/WashOrderDetail";
 
 export default function BottomNav() {
   const [showDialog, setShowDialog] = useState(false);
+  const [refresh, setRefresh] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -31,6 +33,7 @@ export default function BottomNav() {
   ];
 
   return (
+    <>
     <footer className="fixed bottom-0 left-0 right-0 bg-[#262626] border-t border-[#3a3a3a] z-50">
       <div className="flex justify-around items-center h-16 px-2 sm:px-4">
         {navItems.map((item) => (
@@ -50,17 +53,8 @@ export default function BottomNav() {
       </div>
 
       {/* Floating action button (FAB) */}
-      <button
-        onClick={() => setShowDialog(true)}
-        suppressHydrationWarning
-        className="absolute bottom-20 sm:bottom-20 left-1/2 transform -translate-x-1/2 bg-[#f6b100] text-white rounded-full p-4 shadow-lg"
-      >
-        <BsFillFileEarmarkPlusFill size={28} />
-      </button>
-      <CreateOrderDialog
-        isOpen={showDialog}
-        onClose={() => setShowDialog(false)}
-      />
+      
     </footer>
+    </>
   );
 }

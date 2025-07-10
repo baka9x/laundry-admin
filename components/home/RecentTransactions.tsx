@@ -1,10 +1,10 @@
-import { OrdersResponse } from "@/types/order";
+import { WashOrdersResponse } from "@/types/washOrder";
 import Link from "next/link";
 import React from "react";
 import { FaCheckDouble, FaCircle, FaSearch } from "react-icons/fa";
 
 type RecentTransactionsProps = {
-  data: OrdersResponse;
+  data: WashOrdersResponse;
 };
 
 const RecentTransactions: React.FC<RecentTransactionsProps> = ({ data }) => {
@@ -34,7 +34,7 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ data }) => {
 
         {/* Transaction list */}
         <div className="mt-4 px-6 overflow-y-scroll h-[300px]">
-          {data.data.map((item, index) => (
+          {data && data.data && data.data.map((item, index) => (
             <div key={index} className="flex items-center gap-5 mb-3">
               <button className="bg-[#f6b100] text-[#f5f5f5] p-3 text-xl font-bold rounded-lg">
                 #{index}

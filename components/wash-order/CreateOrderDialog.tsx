@@ -8,7 +8,9 @@ import { getUserProfile, getUsers } from "@/services/user";
 import { UsersResponse } from "@/types/user";
 import { CustomerInput, CustomersResponse } from "@/types/customer";
 import { createCustomer, getCustomers } from "@/services/customer";
-import { createOrder } from "@/services/order";
+import { createWashOrder } from "@/services/washOrder";
+import { createNotification } from "@/services/notification";
+import { WashOrder } from "@/types/washOrder";
 
 interface Promotion {
   id: number;
@@ -16,13 +18,17 @@ interface Promotion {
   discount: number;
 }
 
+interface CreateOrderDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onAdd: () => void;
+}
+
 export default function CreateOrderDialog({
   isOpen,
   onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
+  onAdd,
+}: CreateOrderDialogProps) {
   const [searchPhone, setSearchPhone] = useState("");
   const [customers, setCustomers] = useState<CustomersResponse>();
   const [users, setUsers] = useState<UsersResponse>();
@@ -127,6 +133,25 @@ export default function CreateOrderDialog({
     }
   };
 
+  const handleAddNotification = async (item: {
+    id: any;
+    pickUpTime: string;
+    totalAmount: number;
+    status: string;
+  }) => {
+    try {
+      await createNotification(false, {
+        title: `Đơn hàng #${item.id} ${item.status}.`,
+        content: `Đơn hàng #${item.id} - 
+          pickup_time: ${item.pickUpTime} - 
+          Tổng giá tiền (Tạm tính): ${item.totalAmount}đ`,
+        type: "order",
+      });
+    } catch (error) {
+      console.error("Error creating notification:", error);
+    }
+  };
+
   const handleCreateOrder = async () => {
     if (!selectedCustomer || !selectedUser) {
       toast.error(
@@ -144,7 +169,7 @@ export default function CreateOrderDialog({
       }
     }
     try {
-      await createOrder({
+      const res = await createWashOrder({
         customer_id: selectedCustomer,
         user_id: selectedUser,
         order_date: orderDateTime,
@@ -152,8 +177,15 @@ export default function CreateOrderDialog({
         total_amount: totalAmount,
         promotion_id: selectedPromotion ?? null,
       });
+      handleAddNotification({
+        id: res.order_id,
+        pickUpTime: pickupTime,
+        totalAmount: totalAmount,
+        status: "đã tạo thành công",
+      });
       toast.success("Đơn giặt đã được tạo thành công!");
       onClose();
+      onAdd && onAdd();
     } catch (error) {
       toast.error("Lỗi khi tạo đơn giặt. Vui lòng kiểm tra lại thông tin.");
       console.error(error);

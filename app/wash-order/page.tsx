@@ -1,8 +1,5 @@
 import BottomNav from "@/components/layout/BottomNav";
-import Pagination from "@/components/ui/Pagination";
 import WashOrderDetail from "@/components/wash-order/WashOrderDetail";
-import { getOrders } from "@/services/order";
-import { OrdersResponse } from "@/types/order";
 import React from "react";
 
 export default async function WashOrderPage() {

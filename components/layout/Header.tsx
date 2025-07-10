@@ -1,29 +1,89 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
-import { FRONTEND_URL } from '@/config/variables';
-import { FaSearch, FaBell, FaUserCircle } from 'react-icons/fa';
-import { HiOutlineLogout } from 'react-icons/hi';
-import { useState } from 'react';
-import { User } from '@/types/user';
-import clsx from 'clsx';
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { FRONTEND_URL } from "@/config/variables";
+import { FaSearch, FaBell, FaUserCircle, FaTrashAlt } from "react-icons/fa";
+import { HiOutlineLogout } from "react-icons/hi";
+import { useEffect, useState } from "react";
+import { User } from "@/types/user";
+import { NotificationsResponse } from "@/types/notification";
+import {
+  countUnreadNotifications,
+  deleteNotification,
+  getNotifications,
+  markNotificationAsRead,
+} from "@/services/notification";
+import NotificationBadge from "../ui/NotificationBadge";
+import { WashOrdersResponse } from "@/types/washOrder";
+import { getWashOrders } from "@/services/washOrder";
 
 interface HeaderProps {
   data: User;
 }
 
 const Header: React.FC<HeaderProps> = ({ data }) => {
-  const [username] = useState(data.username);
-  const [role] = useState(data.role);
+  const [notifications, setNotifications] =
+    useState<NotificationsResponse | null>(null);
+  const [notificationNumber, setNotificationNumber] = useState(0);
+  const [washOrders, setWashOrders] = useState<WashOrdersResponse | null>(null);
   const [showNotif, setShowNotif] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const router = useRouter();
 
+  const username = data.username;
+  const role = data.role;
+
   function handleLogout() {
-    Cookies.remove('token');
-    router.push('/login');
+    Cookies.remove("token");
+    router.push("/login");
   }
+
+  const fetchAll = async () => {
+    try {
+      const [notifRes, unreadRes, ordersRes] = await Promise.all([
+        getNotifications(false, { limit: 100 }),
+        countUnreadNotifications(false, {}),
+        getWashOrders(false, { date: "today", limit: 100 }),
+      ]);
+
+      if (notifRes?.data) setNotifications(notifRes);
+      if (unreadRes?.data) setNotificationNumber(unreadRes.data.unread_count);
+      if (ordersRes?.data) setWashOrders(ordersRes);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleDeleteNotification = async (id: number) => {
+    try {
+      await deleteNotification(false, id);
+      // Sau khi xoá, refetch ngay
+      fetchAll();
+    } catch (error) {
+      console.error("Error delete notification:", error);
+    }
+  };
+
+  const handleReadNotification = async (id: number) => {
+    try {
+      await markNotificationAsRead(false, id, { is_read: true });
+    } catch (error) {
+      console.error("Error read notification:", error);
+    }
+  };
+
+  useEffect(() => {
+    // Lần đầu
+    fetchAll();
+
+    // Polling mỗi 5 giây
+    const interval = setInterval(() => {
+      fetchAll();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <header className="flex flex-wrap justify-between items-center py-4 px-4 md:px-8 bg-[#1a1a1a] gap-4 relative z-50">
@@ -57,15 +117,50 @@ const Header: React.FC<HeaderProps> = ({ data }) => {
           >
             <FaBell className="text-[#f5f5f5] text-2xl" />
             <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs px-1.5 rounded-full">
-              3
+              {notificationNumber}
             </span>
           </button>
           {showNotif && (
-            <div className="absolute right-0 mt-2 w-64 bg-[#2a2a2a] text-[#f5f5f5] rounded-lg shadow-lg z-50">
+            <div className="absolute right-0 mt-2 w-64 bg-[#2a2a2a] text-[#f5f5f5] rounded-lg shadow-lg z-50 max-h-[400px] overflow-y-auto">
               <ul className="text-sm">
-                <li className="px-4 py-2 border-b border-[#444]">🔔 Bạn có 3 đơn mới</li>
-                <li className="px-4 py-2 border-b border-[#444]">👕 Đơn hàng #12345 đã xong</li>
-                <li className="px-4 py-2">💬 Khách A vừa nhắn tin</li>
+                <li className="flex items-center text-yellow-300 gap-1 px-4 py-2 font-bold border-b border-[#444]">
+                  <FaBell /> Hôm nay: {washOrders ? washOrders.total : 0} đơn
+                  giặt mới
+                </li>
+                {notifications?.data?.length ? (
+                  notifications.data.map((notification) => (
+                    <li
+                      onClick={() => {
+                        if (!notification.is_read) {
+                          handleReadNotification(notification.id);
+                        }
+                      }}
+                      key={notification.id}
+                      className={`flex justify-between ${
+                        !notification.is_read
+                          ? "bg-[#3f3f3f] cursor-pointer font-bold"
+                          : ""
+                      } items-center px-4 py-2 border-b border-[#444]`}
+                    >
+                      <NotificationBadge type={notification.type} />
+                      <span className="ml-2 flex-1 tracking-wide">
+                        {notification.title}
+                      </span>
+                      <button
+                        onClick={() =>
+                          handleDeleteNotification(notification.id)
+                        }
+                        className="ml-2 hover:text-red-300 cursor-pointer"
+                      >
+                        <FaTrashAlt size={10} />
+                      </button>
+                    </li>
+                  ))
+                ) : (
+                  <li className="px-4 py-2 text-gray-400 italic">
+                    Không có thông báo
+                  </li>
+                )}
               </ul>
             </div>
           )}
@@ -79,7 +174,9 @@ const Header: React.FC<HeaderProps> = ({ data }) => {
           >
             <FaUserCircle className="text-[#f5f5f5] text-3xl md:text-4xl" />
             <div className="hidden md:flex flex-col items-start text-left">
-              <h1 className="text-md text-[#f5f5f5] font-semibold">{username}</h1>
+              <h1 className="text-md text-[#f5f5f5] font-semibold">
+                {username}
+              </h1>
               <p className="text-xs text-[#ababab]">{role}</p>
             </div>
           </button>

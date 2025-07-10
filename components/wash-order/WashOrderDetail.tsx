@@ -2,19 +2,25 @@
 
 import { useEffect, useState } from "react";
 import Dropdown from "../ui/DropDown";
-import { OrdersResponse } from "@/types/order";
-import { getOrders, updateOrderStatus } from "@/services/order";
+import { WashOrder, WashOrdersResponse } from "@/types/washOrder";
+import { getWashOrders, updateWashOrderStatus } from "@/services/washOrder";
 import toast from "react-hot-toast";
 import { dateOptions, statusOptions } from "@/config/variables";
 import StatusBadge from "../ui/StatusBadge";
+import { useRouter } from "next/navigation";
+import CreateOrderDialog from "./CreateOrderDialog";
+import { BsFillFileEarmarkPlusFill } from "react-icons/bs";
+import { createNotification } from "@/services/notification";
 
-const WashOrderDetail = () => {
+export default function WashOrderDetail() {
+  const router = useRouter();
+  const [showAddDialog, setShowAddDialog] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [dateSelected, setDateSelected] = useState("Hôm nay");
   const [statusSelected, setStatusSelected] = useState("Tất cả");
   const [dateFilter, setDateFilter] = useState<string>("today");
   const [statusFilter, setStatusFilter] = useState<string>("");
-  const [items, setItems] = useState<OrdersResponse | null>(null);
+  const [items, setItems] = useState<WashOrdersResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const limit = 12;
@@ -25,7 +31,7 @@ const WashOrderDetail = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const data = await getOrders(false, {
+      const data = await getWashOrders(false, {
         status: statusFilter,
         date: dateFilter,
         page: page,
@@ -33,6 +39,7 @@ const WashOrderDetail = () => {
       });
       if (!data || !data.data) {
         toast.error("Không có dữ liệu đơn hàng");
+        setItems(null);
         return;
       }
       setItems(data);
@@ -65,14 +72,63 @@ const WashOrderDetail = () => {
       setOpenDropdownId(null);
     }
   };
+  const handleAddNotification = async (item: {
+    id: number;
+    customerPhone: string;
+    customerName: string;
+    pickUpTime: string;
+    totalAmount: number;
+    status: string;
+  }) => {
+    try {
+      await createNotification(false, {
+        title: `Đơn hàng #${item.id} - ${item.customerPhone} (${item.customerName}) ${item.status}.`,
+        content: `Đơn hàng #${item.id} - 
+            SDT: ${item.customerPhone} (${item.customerName})
+            pickup_time: ${item.pickUpTime} - 
+            Tổng giá tiền (Tạm tính): ${item.totalAmount}đ`,
+        type: "order",
+      });
+    } catch (error) {
+      console.error("Error creating notification:", error);
+    }
+  };
 
   const handleChangeOrderStatus = async (
-    orderId: number,
+    item: WashOrder,
     newStatus: string
   ) => {
     try {
-      await updateOrderStatus(orderId, newStatus);
-      toast.success(`Đã cập nhật trạng thái đơn #${orderId}`);
+      await updateWashOrderStatus(item.id, newStatus);
+      if (newStatus === "completed") {
+        handleAddNotification({
+          id: item.id,
+          customerName: item.customer_name,
+          customerPhone: item.customer_phone,
+          pickUpTime: item.pickup_time,
+          totalAmount: item.total_amount,
+          status: " đã giặt xong",
+        });
+      } else if (newStatus === "deliveried") {
+        handleAddNotification({
+          id: item.id,
+          customerName: item.customer_name,
+          customerPhone: item.customer_phone,
+          pickUpTime: item.pickup_time,
+          totalAmount: item.total_amount,
+          status: " đã thanh toán và giao cho khách",
+        });
+      } else if (newStatus === "processing") {
+        handleAddNotification({
+          id: item.id,
+          customerName: item.customer_name,
+          customerPhone: item.customer_phone,
+          pickUpTime: item.pickup_time,
+          totalAmount: item.total_amount,
+          status: " đang giặt - sấy",
+        });
+      }
+      toast.success(`Đã cập nhật trạng thái đơn #${item.id}`);
       fetchOrders(); // refetch lại danh sách
       setOpenDropdownId(null);
     } catch (error) {
@@ -129,7 +185,7 @@ const WashOrderDetail = () => {
                             <button
                               key={opt.value}
                               onClick={() =>
-                                handleChangeOrderStatus(item.id, opt.value)
+                                handleChangeOrderStatus(item, opt.value)
                               }
                               className="block px-3 py-1 text-left text-xs text-[#f5f5f5] hover:bg-[#3a3a3a] w-full"
                             >
@@ -152,9 +208,13 @@ const WashOrderDetail = () => {
                       ? new Date(item.pickup_time).toLocaleString()
                       : "N/A"}
                   </p>
+                  <p>Tổng giá tiền: {item.total_amount}đ</p>
                 </div>
                 <div className="mt-4 flex justify-end gap-2">
-                  <button className="text-[#f6b100] text-xs hover:underline cursor-pointer">
+                  <button
+                    onClick={() => router.push(`/wash-order/${item.id}`)}
+                    className="text-[#f6b100] text-xs hover:underline cursor-pointer"
+                  >
                     Tính tiền
                   </button>
                   <button className="text-[#f6b100] text-xs hover:underline cursor-pointer">
@@ -193,8 +253,22 @@ const WashOrderDetail = () => {
           </button>
         </div>
       )}
+
+      <button
+        onClick={() => setShowAddDialog(true)}
+        suppressHydrationWarning
+        className="absolute bottom-20 sm:bottom-20 left-1/2 transform -translate-x-1/2 bg-[#f6b100] text-white rounded-full p-4 shadow-lg"
+      >
+        <BsFillFileEarmarkPlusFill size={28} />
+      </button>
+      <CreateOrderDialog
+        isOpen={showAddDialog}
+        onClose={() => setShowAddDialog(false)}
+        onAdd={() => {
+          fetchOrders(); // reload lại list sau khi thêm
+          setShowAddDialog(false); // đóng dialog
+        }}
+      />
     </>
   );
-};
-
-export default WashOrderDetail;
+}

@@ -23,8 +23,8 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, onClick }) => {
             : option?.value === 'deliveried'
             ? 'bg-purple-600 text-white'
             : option?.value === 'cancelled'
-            ? 'bg-red-600 text-white'
-            : 'bg-gray-600 text-white'
+            ? 'bg-gray-600 text-white'
+            : 'bg-red-600 text-white'
         }`}
     >
       {option?.label || status}

@@ -1,34 +1,38 @@
 "use client";
 import { useEffect, useState } from "react";
-import CreateServiceDialog from "./CreateServiceDialog";
-import { Service, ServicesResponse } from "@/types/service";
-import { deleteService, getServices } from "@/services/service";
+import CreateServiceDialog from "./CreatePromotionDialog";
 import toast from "react-hot-toast";
 import { BiTrash } from "react-icons/bi";
 import { FaEdit } from "react-icons/fa";
-import UpdateServiceDialog from "./UpdateServiceDialog";
+import UpdateServiceDialog from "./UpdatePromotionDialog";
 import { Dialog } from "@headlessui/react";
 import { IoAddCircle } from "react-icons/io5";
+import { Promotion, PromotionsResponse } from "@/types/promotion";
+import { getPromotions } from "@/services/promotion";
+import CreatePromotionDialog from "./CreatePromotionDialog";
+import UpdatePromotionDialog from "./UpdatePromotionDialog";
 
-export default function ServiceDetail() {
-  const [items, setItems] = useState<ServicesResponse | null>(null);
+export default function PromotionDetail() {
+  const [items, setItems] = useState<PromotionsResponse | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [selectedPromotion, setSelectedPromotion] = useState<Promotion | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const limit = 12;
 
-  const fetchService = async () => {
+  const fetchPromotion = async () => {
     setLoading(true);
     try {
-      const data = await getServices(false, {
+      const data = await getPromotions(false, {
         page: page,
         limit: limit,
       });
       if (!data || !data.data) {
-        toast.error("Không có dữ liệu dịch vụ");
+        toast.error("Không có dữ liệu khuyến mại");
         return;
       }
       setItems(data);
@@ -39,7 +43,7 @@ export default function ServiceDetail() {
     }
   };
   useEffect(() => {
-    fetchService();
+    fetchPromotion();
   }, [page]);
 
   return (
@@ -69,12 +73,29 @@ export default function ServiceDetail() {
                 <h2 className="text-[#f5f5f5] text-lg font-semibold mb-2">
                   {item.name}
                 </h2>
-                <p className="text-[#ababab] text-sm">{item.description}</p>
-
+                <p className="text-[#ababab] text-sm">
+                  {item.discount_type} : {item.discount_value}
+                </p>
+                <p className="text-[#ababab] text-sm">
+                  Min order: {item.min_order_value}
+                </p>
+                <p className="text-[#ababab] text-sm">
+                  Ngày bắt đầu: {item.start_date}
+                </p>
+                <p className="text-[#ababab] text-sm">
+                  Ngày kết thúc: {item.end_date}
+                </p>
+                <p className="text-[#ababab] text-sm">
+                  Yêu cầu VIP: {item.priority_level_required}
+                </p>
+                <p className="text-[#ababab] text-sm">
+                  Trạng thái:{" "}
+                  {item.is_active ? "Đang kích hoạt" : "Không kích hoạt"}
+                </p>
                 <div className="flex justify-end gap-2 mt-2">
                   <button
                     onClick={() => {
-                      setSelectedService(item);
+                      setSelectedPromotion(item);
                       setShowUpdateDialog(true);
                     }}
                     className="text-yellow-500 hover:text-yellow-400"
@@ -84,7 +105,7 @@ export default function ServiceDetail() {
                   </button>
                   <button
                     onClick={() => {
-                      setSelectedService(item);
+                      setSelectedPromotion(item);
                       setShowDeleteDialog(true);
                     }}
                     className="text-red-500 hover:text-red-400"
@@ -98,21 +119,21 @@ export default function ServiceDetail() {
         </div>
       </div>
 
-      <CreateServiceDialog
+      <CreatePromotionDialog
         open={showAddDialog}
         onClose={() => setShowAddDialog(false)}
         onAdd={() => {
-          fetchService(); // reload lại list sau khi thêm
+          fetchPromotion(); // reload lại list sau khi thêm
           setShowAddDialog(false); // đóng dialog
         }}
       />
-      {selectedService && (
-        <UpdateServiceDialog
+      {selectedPromotion && (
+        <UpdatePromotionDialog
           open={showUpdateDialog}
           onClose={() => setShowUpdateDialog(false)}
-          service={selectedService}
+          promotion={selectedPromotion}
           onUpdate={() => {
-            fetchService();
+            fetchPromotion();
             setShowUpdateDialog(false);
           }}
         />
@@ -135,7 +156,7 @@ export default function ServiceDetail() {
             <p className="text-[#ababab] text-sm">
               Bạn có chắc muốn xoá dịch vụ:{" "}
               <span className="font-semibold text-[#f5f5f5]">
-                {selectedService?.name}
+                {selectedPromotion?.name}
               </span>
               ?
             </p>
@@ -148,11 +169,11 @@ export default function ServiceDetail() {
               </button>
               <button
                 onClick={async () => {
-                  if (!selectedService) return;
+                  if (!selectedPromotion) return;
                   try {
-                    await deleteService(false, selectedService.id);
+                    await deleteService(false, selectedPromotion.id);
                     toast.success("Xoá thành công");
-                    fetchService();
+                    fetchPromotion();
                     setShowDeleteDialog(false);
                   } catch (err) {
                     console.error(err);

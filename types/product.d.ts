@@ -10,3 +10,18 @@ export interface Product {
   created_at: string;
   updated_at: string;
 }
+
+export interface ProductInput {
+  service_id: number;
+  name: string;
+  price: number;
+  unit: string;
+}
+
+export interface ProductsResponse {
+  data: Product[];
+  limit: number;
+  page: number;
+  total: number;
+  total_page: number;
+}

@@ -1,58 +1,59 @@
 "use client";
 import { useEffect, useState } from "react";
-import CreateServiceDialog from "./CreateServiceDialog";
-import { Service, ServicesResponse } from "@/types/service";
-import { deleteService, getServices } from "@/services/service";
 import toast from "react-hot-toast";
 import { BiTrash } from "react-icons/bi";
 import { FaEdit } from "react-icons/fa";
-import UpdateServiceDialog from "./UpdateServiceDialog";
 import { Dialog } from "@headlessui/react";
 import { IoAddCircle } from "react-icons/io5";
+import CreateProductDialog from "./CreateProductDialog";
+import UpdateProductDialog from "./UpdateProductDialog";
+import { Product, ProductsResponse } from "@/types/product";
+import { deleteProduct, getProducts } from "@/services/product";
 
-export default function ServiceDetail() {
-  const [items, setItems] = useState<ServicesResponse | null>(null);
+export default function ProductDetail() {
+  const [items, setItems] = useState<ProductsResponse | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const limit = 12;
 
-  const fetchService = async () => {
+  const fetchProducts = async () => {
     setLoading(true);
     try {
-      const data = await getServices(false, {
+      const data = await getProducts(false, {
         page: page,
         limit: limit,
       });
       if (!data || !data.data) {
-        toast.error("Không có dữ liệu dịch vụ");
+        toast.error("Không có dữ liệu sản phẩm");
         return;
       }
+      console.log(data);
       setItems(data);
     } catch (error) {
-      console.error("Error fetching orders:", error);
+      console.error("Error fetching products:", error);
     } finally {
       setLoading(false);
     }
   };
   useEffect(() => {
-    fetchService();
+    fetchProducts();
   }, [page]);
 
   return (
     <>
       <div className="flex items-center justify-between px-6 md:px-10 py-4">
         <h1 className="text-[#f5f5f5] text-xl md:text-2xl font-semibold tracking-wide">
-          Quản lý dịch vụ
+          Quản lý sản phẩm
         </h1>
         <button
           onClick={() => setShowAddDialog(true)}
           className="flex items-center gap-1 bg-yellow-500 hover:bg-yellow-600 text-[#f5f5f5] font-semibold px-4 py-1 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out cursor-pointer"
         >
-          <IoAddCircle /> Thêm dịch vụ
+          <IoAddCircle /> Thêm sản phẩm
         </button>
       </div>
 
@@ -63,18 +64,26 @@ export default function ServiceDetail() {
               <div
                 key={index}
                 className="bg-[#1f1f1f] p-4 rounded-lg shadow-md 
-                hover:shadow-lg hover:scale-[1.03] hover:-translate-y-1 
-                transition-all duration-300 ease-in-out cursor-pointer"
+  hover:shadow-lg hover:scale-[1.03] hover:-translate-y-1 
+  transition-all duration-300 ease-in-out cursor-pointer"
               >
-                <h2 className="text-[#f5f5f5] text-lg font-semibold mb-2">
+                <h2 className="text-[#f5f5f5] text-lg font-semibold mb-1">
                   {item.name}
                 </h2>
-                <p className="text-[#ababab] text-sm">{item.description}</p>
+
+                {/* Hiển thị tên dịch vụ */}
+                <p className="text-[#8ecae6] text-xs mb-1">
+                  Dịch vụ: {item.service?.name || "Không có"}
+                </p>
+
+                <p className="text-[#ababab] text-sm">
+                  {item.price} VND / {item.unit}
+                </p>
 
                 <div className="flex justify-end gap-2 mt-2">
                   <button
                     onClick={() => {
-                      setSelectedService(item);
+                      setSelectedProduct(item);
                       setShowUpdateDialog(true);
                     }}
                     className="text-yellow-500 hover:text-yellow-400"
@@ -84,7 +93,7 @@ export default function ServiceDetail() {
                   </button>
                   <button
                     onClick={() => {
-                      setSelectedService(item);
+                      setSelectedProduct(item);
                       setShowDeleteDialog(true);
                     }}
                     className="text-red-500 hover:text-red-400"
@@ -98,21 +107,21 @@ export default function ServiceDetail() {
         </div>
       </div>
 
-      <CreateServiceDialog
+      <CreateProductDialog
         open={showAddDialog}
         onClose={() => setShowAddDialog(false)}
         onAdd={() => {
-          fetchService(); // reload lại list sau khi thêm
+          fetchProducts(); // reload lại list sau khi thêm
           setShowAddDialog(false); // đóng dialog
         }}
       />
-      {selectedService && (
-        <UpdateServiceDialog
+      {selectedProduct && (
+        <UpdateProductDialog
           open={showUpdateDialog}
           onClose={() => setShowUpdateDialog(false)}
-          service={selectedService}
+          product={selectedProduct}
           onUpdate={() => {
-            fetchService();
+            fetchProducts();
             setShowUpdateDialog(false);
           }}
         />
@@ -135,7 +144,7 @@ export default function ServiceDetail() {
             <p className="text-[#ababab] text-sm">
               Bạn có chắc muốn xoá dịch vụ:{" "}
               <span className="font-semibold text-[#f5f5f5]">
-                {selectedService?.name}
+                {selectedProduct?.name}
               </span>
               ?
             </p>
@@ -148,11 +157,11 @@ export default function ServiceDetail() {
               </button>
               <button
                 onClick={async () => {
-                  if (!selectedService) return;
+                  if (!selectedProduct) return;
                   try {
-                    await deleteService(false, selectedService.id);
+                    await deleteProduct(false, selectedProduct.id);
                     toast.success("Xoá thành công");
-                    fetchService();
+                    fetchProducts();
                     setShowDeleteDialog(false);
                   } catch (err) {
                     console.error(err);
