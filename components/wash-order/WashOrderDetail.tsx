@@ -211,15 +211,20 @@ export default function WashOrderDetail() {
                   <p>Tổng giá tiền: {item.total_amount}đ</p>
                 </div>
                 <div className="mt-4 flex justify-end gap-2">
-                  <button
-                    onClick={() => router.push(`/wash-order/${item.id}`)}
-                    className="text-[#f6b100] text-xs hover:underline cursor-pointer"
-                  >
-                    Tính tiền
-                  </button>
-                  <button className="text-[#f6b100] text-xs hover:underline cursor-pointer">
-                    Xem chi tiết
-                  </button>
+                  {item.status !== "deliveried" &&
+                    item.status === "completed" && (
+                      <button
+                        onClick={() => router.push(`/wash-order/${item.id}`)}
+                        className="text-[#f6b100] text-xs hover:underline cursor-pointer"
+                      >
+                        Tính tiền
+                      </button>
+                    )}
+                  {item.status === "deliveried" && (
+                    <button className="text-[#f6b100] text-xs hover:underline cursor-pointer">
+                      Xem chi tiết
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

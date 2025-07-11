@@ -10,13 +10,8 @@ import { CustomerInput, CustomersResponse } from "@/types/customer";
 import { createCustomer, getCustomers } from "@/services/customer";
 import { createWashOrder } from "@/services/washOrder";
 import { createNotification } from "@/services/notification";
-import { WashOrder } from "@/types/washOrder";
-
-interface Promotion {
-  id: number;
-  name: string;
-  discount: number;
-}
+import { PromotionsResponse } from "@/types/promotion";
+import { getPromotions } from "@/services/promotion";
 
 interface CreateOrderDialogProps {
   isOpen: boolean;
@@ -32,7 +27,7 @@ export default function CreateOrderDialog({
   const [searchPhone, setSearchPhone] = useState("");
   const [customers, setCustomers] = useState<CustomersResponse>();
   const [users, setUsers] = useState<UsersResponse>();
-  const [promotions, setPromotions] = useState<Promotion[]>([]);
+  const [promotions, setPromotions] = useState<PromotionsResponse>();
 
   const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
   const [newCustomer, setNewCustomer] = useState<CustomerInput>({
@@ -56,6 +51,16 @@ export default function CreateOrderDialog({
       toast.error("Lỗi khi tải danh sách khách hàng");
     }
   };
+
+  const fetchPromotions = async () => {
+    try {
+      const promotionsData = await getPromotions(false, { limit: 50 });
+      setPromotions(promotionsData);
+    } catch (error) {
+      toast.error("Lỗi khi tải danh sách khuyến mại");
+    }
+  };
+
   const fetchUser = async () => {
     try {
       const user = await getUserProfile(false);
@@ -79,7 +84,7 @@ export default function CreateOrderDialog({
       fetchCustomers();
       fetchUser();
       fetchUsers();
-      //axios.get("/api/promotions").then((res) => setPromotions(res.data));
+      fetchPromotions();
     }
   }, [isOpen]);
 
@@ -361,11 +366,12 @@ export default function CreateOrderDialog({
             className="w-full p-2 rounded bg-[#343434] text-white"
           >
             <option value="">Không áp dụng</option>
-            {promotions.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name} - Giảm {p.discount}%
-              </option>
-            ))}
+            {promotions &&
+              promotions.data.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
           </select>
         </div>
         <div className="flex gap-2">

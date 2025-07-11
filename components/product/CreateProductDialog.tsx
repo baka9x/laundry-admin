@@ -147,6 +147,7 @@ export default function CreateProductDialog({
             <option value="">-- Chọn đơn vị --</option>
             <option value="Cái">Cái</option>
             <option value="Lần">Lần</option>
+            <option value="Con">Con</option>
             <option value="Kg">Kg</option>
             <option value="Lượt">Lượt</option>
           </select>

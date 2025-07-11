@@ -9,22 +9,22 @@ import { getUserProfile } from "@/services/user";
 import { CustomersResponse } from "@/types/customer";
 import { WashOrdersResponse } from "@/types/washOrder";
 import { User } from "@/types/user";
-import { BsCashCoin } from "react-icons/bs";
-import { GrInProgress } from "react-icons/gr";
+import { TbWashHand } from "react-icons/tb";
+import { IoMdCafe } from "react-icons/io";
 
 const dataTotalEarnings = {
-  title: "Thu nhập hôm nay",
+  title: "Thu Nhập Giặt Sấy Hôm Nay",
   value: "1.000.000đ",
-  icon: <BsCashCoin size={30} />,
-  bgIcon: "bg-[#02ca3a]",
+  icon: <TbWashHand size={30}/>,
+  bgIcon: "bg-blue-500",
   number: 1000000,
   footerNum: 10,
 };
 
 const dataInProgress = {
-  title: "Đang xử lý",
+  title: "Thu Nhập Đồ Uống Hôm Nay",
   value: "1.000.000đ",
-  icon: <GrInProgress size={30} />,
+  icon: <IoMdCafe size={30}/>,
   bgIcon: "bg-[#f68100]",
   number: 1000000,
   footerNum: 10,

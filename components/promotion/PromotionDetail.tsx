@@ -1,14 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import CreateServiceDialog from "./CreatePromotionDialog";
 import toast from "react-hot-toast";
 import { BiTrash } from "react-icons/bi";
 import { FaEdit } from "react-icons/fa";
-import UpdateServiceDialog from "./UpdatePromotionDialog";
 import { Dialog } from "@headlessui/react";
 import { IoAddCircle } from "react-icons/io5";
 import { Promotion, PromotionsResponse } from "@/types/promotion";
-import { getPromotions } from "@/services/promotion";
+import { deletePromotion, getPromotions } from "@/services/promotion";
 import CreatePromotionDialog from "./CreatePromotionDialog";
 import UpdatePromotionDialog from "./UpdatePromotionDialog";
 
@@ -50,13 +48,13 @@ export default function PromotionDetail() {
     <>
       <div className="flex items-center justify-between px-6 md:px-10 py-4">
         <h1 className="text-[#f5f5f5] text-xl md:text-2xl font-semibold tracking-wide">
-          Quản lý dịch vụ
+          Quản lý khuyến mại
         </h1>
         <button
           onClick={() => setShowAddDialog(true)}
           className="flex items-center gap-1 bg-yellow-500 hover:bg-yellow-600 text-[#f5f5f5] font-semibold px-4 py-1 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out cursor-pointer"
         >
-          <IoAddCircle /> Thêm dịch vụ
+          <IoAddCircle /> Thêm
         </button>
       </div>
 
@@ -154,7 +152,7 @@ export default function PromotionDetail() {
               Xác nhận xoá
             </div>
             <p className="text-[#ababab] text-sm">
-              Bạn có chắc muốn xoá dịch vụ:{" "}
+              Bạn có chắc muốn xoá khuyến mại:{" "}
               <span className="font-semibold text-[#f5f5f5]">
                 {selectedPromotion?.name}
               </span>
@@ -171,7 +169,7 @@ export default function PromotionDetail() {
                 onClick={async () => {
                   if (!selectedPromotion) return;
                   try {
-                    await deleteService(false, selectedPromotion.id);
+                    await deletePromotion(false, selectedPromotion.id);
                     toast.success("Xoá thành công");
                     fetchPromotion();
                     setShowDeleteDialog(false);

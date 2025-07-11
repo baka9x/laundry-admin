@@ -52,7 +52,7 @@ export default function ServiceDetail() {
           onClick={() => setShowAddDialog(true)}
           className="flex items-center gap-1 bg-yellow-500 hover:bg-yellow-600 text-[#f5f5f5] font-semibold px-4 py-1 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out cursor-pointer"
         >
-          <IoAddCircle /> Thêm dịch vụ
+          <IoAddCircle /> Thêm
         </button>
       </div>
 

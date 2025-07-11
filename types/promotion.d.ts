@@ -18,9 +18,9 @@ export interface PromotionInput {
   discount_type: "percentage" | "fixed" | string;
   discount_value: number;
   min_order_value: number;
-  priority_level_required: number | null;
-  start_date: string;
-  end_date: string;
+  priority_level_required: number;
+  start_date: Date | null;
+  end_date: Date | null;
   is_active: boolean;
 }
 
