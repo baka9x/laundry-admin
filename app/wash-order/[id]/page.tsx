@@ -14,7 +14,7 @@ export default async function WashOrderPage({ params }: WashOrderPageProps) {
 
   const [order, products] = await Promise.all([
     getWashOrderByID(true, orderId),
-    getProducts(true, { page: 1, limit: 100 }),
+    getProducts(true, { type: "wash", page: 1, limit: 100 }),
   ]);
 
   return (

@@ -15,7 +15,7 @@ export const createProduct = async (isServer: false, input: ProductInput) => {
 
 export const getProducts = async (
   isServer: boolean,
-  params: { service_id?: number, page?: number; limit?: number }
+  params: { type?: string, service_id?: number, page?: number; limit?: number }
 ): Promise<ProductsResponse> => {
   if (isServer) {
     await getServerToken();

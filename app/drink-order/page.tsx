@@ -1,15 +1,22 @@
-export default function DrinkOrderPage() {
-    return (
-        <div className="flex flex-col items-center justify-center h-screen">
-            <h1 className="text-2xl font-bold text-[#f5f5f5]">
-                Trang Đặt Nước Uống                 
-            </h1>
-            <p className="text-[#ababab] mt-4">
-                Đây là trang dành cho việc đặt nước uống. Hiện tại chưa có chức năng nào
-                được triển khai.
-            </p>
-            <p className="text-[#ababab] mt-2">
-                Vui lòng quay lại sau để xem các tính năng mới.
-            </p>
-        </div>)
+import BottomNav from "@/components/layout/BottomNav";
+import WashPOS from "@/components/wash-order/pos/WashPOS";
+import { getProducts } from "@/services/product";
+import { getWashOrderByID } from "@/services/washOrder";
+
+import React from "react";
+
+
+export default async function DrinkOrderPage() {
+ 
+  const [order, products] = await Promise.all([
+    getWashOrderByID(true, orderId),
+    getProducts(true, { page: 1, limit: 100 }),
+  ]);
+
+  return (
+    <section className="md:h-[calc(100vh-5rem)] overflow-auto overflow-x-scroll px-4 py-6">
+      <WashPOS order={order} products={products.data} />
+      <BottomNav />
+    </section>
+  );
 }
