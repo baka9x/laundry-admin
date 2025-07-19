@@ -58,7 +58,6 @@ const Header: React.FC<HeaderProps> = ({ data }) => {
   const handleDeleteNotification = async (id: number) => {
     try {
       await deleteNotification(false, id);
-      // Sau khi xoá, refetch ngay
       fetchAll();
     } catch (error) {
       console.error("Error delete notification:", error);
@@ -68,16 +67,17 @@ const Header: React.FC<HeaderProps> = ({ data }) => {
   const handleReadNotification = async (id: number) => {
     try {
       await markNotificationAsRead(false, id, { is_read: true });
+      fetchAll();
     } catch (error) {
       console.error("Error read notification:", error);
     }
   };
 
   useEffect(() => {
-    // Lần đầu
+    if (!Cookies.get("token")) {
+      return;
+    }
     fetchAll();
-
-    // Polling mỗi 5 giây
     const interval = setInterval(() => {
       fetchAll();
     }, 5000);

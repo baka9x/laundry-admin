@@ -16,6 +16,9 @@ export interface CustomerInput {
     name: string;
     phone: string;
     address: string;
+    priority_level?: number;
+    note?: string;
+    total_washes?: number;
 }
 
 export interface CustomersResponse {

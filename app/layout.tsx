@@ -12,8 +12,8 @@ export default async function RootLayout({
   let user: User = {} as User;
   try {
     user = await getUserProfile(true);
-  } catch (error) {
-    console.log("User not logged in or error:", error);
+  } catch {
+    //console.log("User not logged in or error:", error);
   }
   return (
     <html lang="en" suppressHydrationWarning>

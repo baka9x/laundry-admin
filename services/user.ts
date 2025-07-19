@@ -7,7 +7,7 @@ export const login = async (credentials: LoginCredentials) => {
   return response.data;
 }
 
-export const getUserProfile = async (isServer = false): Promise<User> => {
+export const getUserProfile = async (isServer:boolean): Promise<User> => {
   if (isServer) {
     await getServerToken();
     const res = await serverApi.get('/auth/users/me');

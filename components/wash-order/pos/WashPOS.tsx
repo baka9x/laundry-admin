@@ -1,11 +1,11 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Product } from "@/types/product";
 import { WashOrderDetailResponse } from "@/types/washOrder";
 import { useRouter } from "next/navigation";
 import { createWashOrderItem } from "@/services/washOrderItem";
 import toast from "react-hot-toast";
-import { updateWashOrderTotalPrice } from "@/services/washOrder";
+import { updateWashOrderStatus, updateWashOrderTotalPrice } from "@/services/washOrder";
 import {
   IoAdd,
   IoCheckmarkCircle,
@@ -15,6 +15,12 @@ import {
 } from "react-icons/io5";
 import { BiMinus, BiPlus } from "react-icons/bi";
 import { FaTrashAlt } from "react-icons/fa";
+import { ServicesResponse } from "@/types/service";
+import { getServices } from "@/services/service";
+import { getProducts } from "@/services/product";
+import { formatVND } from "@/lib/formatVND";
+import InvoiceModal from "../InvoiceModal";
+import { createNotification } from "@/services/notification";
 
 interface Props {
   order: WashOrderDetailResponse;
@@ -23,8 +29,43 @@ interface Props {
 
 export default function WashPOS({ order, products }: Props) {
   const router = useRouter();
-
+  const [services, setServices] = useState<ServicesResponse | null>(null);
   const [localItems, setLocalItems] = useState<any[]>([]); // any[] => bạn có thể định nghĩa rõ hơn
+  const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
+  const [productList, setProductList] = useState<Product[]>(products);
+  const [showInvoice, setShowInvoice] = useState(false);
+  const isDeliveried = order.status === "deliveried";
+
+  const fetchProductsByService = async (serviceId: number | null) => {
+    try {
+      const res = await getProducts(false, {
+        service_id: serviceId ?? undefined,
+        limit: 100,
+      });
+      setProductList(res.data); // res.data là mảng sản phẩm
+      setSelectedServiceId(serviceId);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
+  const fetchServices = async () => {
+    try {
+      const res = await getServices(false, { limit: 20 });
+      if (!res) {
+        return;
+      }
+      setServices(res);
+    } catch (error) {
+      console.error("Error fetching service:", error);
+    }
+  }
+
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
 
   const subtotal = useMemo(
     () => localItems.reduce((sum, item) => sum + item.subtotal, 0),
@@ -50,10 +91,10 @@ export default function WashPOS({ order, products }: Props) {
         return prev.map((item) =>
           item.product_id === product.id
             ? {
-                ...item,
-                quantity: item.quantity + 1,
-                subtotal: (item.quantity + 1) * item.unit_price,
-              }
+              ...item,
+              quantity: item.quantity + 1,
+              subtotal: (item.quantity + 1) * item.unit_price,
+            }
             : item
         );
       }
@@ -106,8 +147,19 @@ export default function WashPOS({ order, products }: Props) {
       }
 
       await updateWashOrderTotalPrice(order.id, total);
-      toast.success("Đã thêm sản phẩm vào đơn giặt!");
-      router.refresh();
+      toast.success("Đã thanh toán thành công!");
+      setShowInvoice(true); // mở dialog
+      // router.refresh(); // vẫn có thể refresh sau
+      await updateWashOrderStatus(order.id, "deliveried");
+      await createNotification(false, {
+        title: `Đơn hàng #${order.id} - ${order.customer.phone} (${order.customer.name}) đã thanh toán và giao cho khách.`,
+        content: `Đơn hàng #${order.id} - 
+                  SDT: ${order.customer.phone} (${order.customer.name})
+                  pickup_time: ${order.pickup_time} - 
+                  Tổng giá tiền (Tạm tính): ${formatVND(order.total_amount)}`,
+        type: "order",
+      });
+
     } catch (e) {
       console.error(e);
       toast.error("Thêm sản phẩm thất bại!");
@@ -115,7 +167,8 @@ export default function WashPOS({ order, products }: Props) {
   };
 
   return (
-      <div className="bg-[#1f1f1f] rounded-xl shadow-lg overflow-hidden text-[#f5f5f5] mt-6">
+    <>
+      <div className="bg-[#1f1f1f] rounded-xl shadow-lg overflow-hidden text-[#f5f5f5] mt-2 mb-5">
         <div className="flex flex-col md:flex-row">
           {/* Order Section */}
           <div className="w-full md:w-2/5 border-b md:border-b-0 md:border-r border-[#444] bg-[#262626]">
@@ -158,12 +211,13 @@ export default function WashPOS({ order, products }: Props) {
                       className="p-4 rounded-lg border border-[#444] bg-[#1f1f1f]"
                     >
                       <div className="flex justify-between items-center">
-                        <div>
+                        <div className="flex flex-col items-start gap-0.5">
+
                           <h4 className="font-bold text-[#f5f5f5] tracking-wide">
                             {item.product?.name || "N/A"}
                           </h4>
-                          <span className="text-sm text-gray-500 tracking-wide">{item.unit_price.toLocaleString()}đ /{" "}
-                          {item.product?.unit}</span>
+                          <span className="text-sm text-yellow-500 font-bold tracking-wide">{item.unit_price.toLocaleString()} đ /{" "}
+                            {item.product?.unit}</span>
                         </div>
                         <div className="flex items-center">
                           <button
@@ -174,9 +228,17 @@ export default function WashPOS({ order, products }: Props) {
                           >
                             <BiMinus />
                           </button>
-                          <span className="mx-2 w-8 text-center">
-                            {item.quantity}
-                          </span>
+                          <input
+                            type="number"
+                            min={0.01}
+                            step="0.01"
+                            className="mx-2 w-12 text-center bg-gray-800 text-white rounded"
+                            value={item.quantity}
+                            onChange={(e) => {
+                              const value = parseFloat(e.target.value);
+                              if (!isNaN(value)) updateQuantity(item.product_id, value);
+                            }}
+                          />
                           <button
                             onClick={() =>
                               updateQuantity(item.product_id, item.quantity + 1)
@@ -193,36 +255,6 @@ export default function WashPOS({ order, products }: Props) {
                           </button>
                         </div>
                       </div>
-                      {/* <div>
-                        <div className="font-medium">
-                          {item.product?.name || "N/A"}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {item.unit_price.toLocaleString()} đ /{" "}
-                          {item.product?.unit}
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <button
-                          onClick={() =>
-                            updateQuantity(item.product_id, item.quantity - 1)
-                          }
-                        >
-                          -
-                        </button>
-                        <span>{item.quantity}</span>
-                        <button
-                          onClick={() =>
-                            updateQuantity(item.product_id, item.quantity + 1)
-                          }
-                        >
-                          +
-                        </button>
-                        <button onClick={() => removeItem(item.product_id)}>
-                          🗑
-                        </button>
-                      </div> */}
-
                     </div>
                   ))}
                 </div>
@@ -232,11 +264,11 @@ export default function WashPOS({ order, products }: Props) {
             <div className="p-4 border-b border-[#444] space-y-1">
               <div className="flex justify-between">
                 <span className="text-gray-400">Tạm tính</span>
-                <span className="font-medium">{subtotal.toLocaleString()} đ</span>
+                <span className="font-medium">{formatVND(subtotal)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Giảm giá</span>
-                <span className="font-medium">{discount.toLocaleString()} đ</span>
+                <span className="font-medium">{formatVND(discount)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Thuế</span>
@@ -245,21 +277,22 @@ export default function WashPOS({ order, products }: Props) {
               <div className="flex justify-between mt-3 pt-3 border-t border-[#444]">
                 <span className="text-lg font-semibold">Tổng</span>
                 <span className="text-lg font-semibold text-yellow-500">
-                  {total.toLocaleString()} đ
+                  {formatVND(total)}
                 </span>
               </div>
             </div>
 
             <div className="p-4">
               <div className="grid grid-cols-2 gap-3">
-                <button 
-                onClick={clearOrder}
-                className="bg-[#444] hover:bg-[#555] text-[#f5f5f5] py-3 px-4 rounded-lg transition font-medium">
+                <button
+                  onClick={clearOrder}
+                  className="bg-[#444] hover:bg-[#555] text-[#f5f5f5] py-3 px-4 rounded-lg transition font-medium">
                   <IoTrash className="inline mr-2" /> Xoá hết
                 </button>
-                <button 
-                onClick={handleCheckout}
-                className="bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg transition font-medium">
+                <button
+                  onClick={handleCheckout}
+                  disabled={isDeliveried}
+                  className="bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg transition font-medium">
                   <IoCheckmarkCircle className="inline mr-2" /> Thanh toán
                 </button>
               </div>
@@ -274,17 +307,27 @@ export default function WashPOS({ order, products }: Props) {
                   Dịch vụ giặt ủi
                 </h2>
                 <div className="flex flex-wrap gap-2">
-                  {["Tất cả", "Giặt", "Ủi", "Hấp"].map((label, idx) => (
+                  <button
+                    onClick={() => fetchProductsByService(null)}
+                    className={`px-3 py-1 rounded-full text-sm font-medium 
+      ${selectedServiceId === null
+                        ? "bg-yellow-500 text-[#1f1f1f]"
+                        : "bg-[#444] text-[#f5f5f5] hover:bg-[#555]"}
+    `}
+                  >
+                    Tất cả
+                  </button>
+                  {services && services.data.map((service) => (
                     <button
-                      key={idx}
+                      key={service.id}
+                      onClick={() => fetchProductsByService(service.id)}
                       className={`px-3 py-1 rounded-full text-sm font-medium 
-                                ${
-                                  idx === 0
-                                    ? "bg-yellow-500 text-[#1f1f1f]"
-                                    : "bg-[#444] text-[#f5f5f5] hover:bg-[#555]"
-                                }`}
+        ${selectedServiceId === service.id
+                          ? "bg-yellow-500 text-[#1f1f1f]"
+                          : "bg-[#444] text-[#f5f5f5] hover:bg-[#555]"}
+      `}
                     >
-                      {label}
+                      {service.name}
                     </button>
                   ))}
                 </div>
@@ -293,9 +336,9 @@ export default function WashPOS({ order, products }: Props) {
 
             <div className="p-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                 {products.map((product) => (
+                {productList.map((product) => (
                   <div
-                  onClick={() => addItem(product)}
+                    onClick={() => addItem(product)}
                     key={product.id}
                     className="bg-[#2a2a2a] border border-[#444] rounded-lg overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer"
                   >
@@ -311,7 +354,7 @@ export default function WashPOS({ order, products }: Props) {
                       </div>
                       <div className="mt-4 flex justify-between items-center">
                         <span className="text-lg font-semibold text-yellow-500">
-                          {product.price.toLocaleString()} đ 
+                          {formatVND(product.price)}
                         </span>
                         <button className="bg-yellow-100 text-yellow-800 p-2 rounded-full hover:bg-yellow-200 transition">
                           <IoAdd />
@@ -325,5 +368,24 @@ export default function WashPOS({ order, products }: Props) {
           </div>
         </div>
       </div>
+
+      {showInvoice && (
+        <InvoiceModal
+          show={showInvoice}
+          onClose={() => {
+            setShowInvoice(false);
+            clearOrder();
+            router.refresh();
+          }}
+          items={localItems}
+          subtotal={subtotal}
+          discount={discount}
+          total={total}
+          orderId={order.id}
+          customerName={order.customer.name}
+          customerPhone={order.customer.phone}
+        />
+      )}
+    </>
   );
 }

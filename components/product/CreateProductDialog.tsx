@@ -149,6 +149,7 @@ export default function CreateProductDialog({
             <option value="Lần">Lần</option>
             <option value="Con">Con</option>
             <option value="Kg">Kg</option>
+            <option value="Đôi">Đôi</option>
             <option value="Lượt">Lượt</option>
           </select>
 

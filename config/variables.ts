@@ -14,6 +14,6 @@ export const statusOptions = [
   { value: "pending", label: "Đang chờ" },
   { value: "processing", label: "Đang xử lý" },
   { value: "completed", label: "Đã xong" },
-  { value: "deliveried", label: "Đã giao" },
+  { value: "deliveried", label: "Đã thanh toán" },
   { value: "cancelled", label: "Đã huỷ" },
 ];

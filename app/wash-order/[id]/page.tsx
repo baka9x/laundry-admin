@@ -1,5 +1,4 @@
 import BottomNav from "@/components/layout/BottomNav";
-import POSLayout from "@/components/wash-order/pos/POSLayout";
 import WashPOS from "@/components/wash-order/pos/WashPOS";
 import { getProducts } from "@/services/product";
 import { getWashOrderByID } from "@/services/washOrder";
@@ -19,8 +18,7 @@ export default async function WashOrderPage({ params }: WashOrderPageProps) {
   ]);
 
   return (
-    <section className="md:h-[calc(100vh-5rem)] overflow-hidden mb-15">
-      
+    <section className="md:h-[calc(100vh-5rem)] overflow-auto overflow-x-scroll px-4 py-6">
       <WashPOS order={order} products={products.data} />
       <BottomNav />
     </section>

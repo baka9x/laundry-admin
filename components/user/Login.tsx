@@ -14,7 +14,6 @@ export default function LoginForm() {
     async function handleLogin() {
         try {
             const user = await login({ username: username, password: password });
-            console.log(user)
             Cookies.set('token', user.token);
             router.push('/');
         } catch (err: any) {

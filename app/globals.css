@@ -24,3 +24,18 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@media print {
+  body * {
+    visibility: hidden;           /* Ẩn toàn bộ */
+  }
+  #invoice, #invoice * {
+    visibility: visible;          /* Hiện chỉ phần hóa đơn */
+  }
+  #invoice {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}

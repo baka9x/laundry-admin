@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import CreateOrderDialog from "./CreateOrderDialog";
 import { BsFillFileEarmarkPlusFill } from "react-icons/bs";
 import { createNotification } from "@/services/notification";
+import { formatVND } from "@/lib/formatVND";
 
 export default function WashOrderDetail() {
   const router = useRouter();
@@ -208,7 +209,7 @@ export default function WashOrderDetail() {
                       ? new Date(item.pickup_time).toLocaleString()
                       : "N/A"}
                   </p>
-                  <p>Tổng giá tiền: {item.total_amount}đ</p>
+                  <p>Tổng giá tiền: {formatVND(item.total_amount)}</p>
                 </div>
                 <div className="mt-4 flex justify-end gap-2">
                   {item.status !== "deliveried" &&

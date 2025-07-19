@@ -95,7 +95,7 @@ export default function CreateOrderDialog({
     }
 
     const delayDebounce = setTimeout(async () => {
-      const res = await getCustomers(false, searchPhone);
+      const res = await getCustomers(false, { phone: searchPhone });
       setCustomers(res);
       if (res.data.length > 0) {
         setSelectedCustomer(res.data[0].id);
@@ -116,8 +116,8 @@ export default function CreateOrderDialog({
         return;
       }
 
-      const res = await createCustomer(newCustomer);
-      const updatedCustomers = await getCustomers(false, newCustomer.phone);
+      const res = await createCustomer(false, newCustomer);
+      const updatedCustomers = await getCustomers(false, { phone: newCustomer.phone });
       setCustomers(updatedCustomers);
       const newCust = updatedCustomers.data.find(
         (c) => c.phone === newCustomer.phone

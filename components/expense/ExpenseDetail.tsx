@@ -5,49 +5,49 @@ import { BiTrash } from "react-icons/bi";
 import { FaEdit } from "react-icons/fa";
 import { Dialog } from "@headlessui/react";
 import { IoAddCircle } from "react-icons/io5";
-import CreateProductDialog from "./CreateProductDialog";
-import UpdateProductDialog from "./UpdateProductDialog";
-import { Product, ProductsResponse } from "@/types/product";
-import { deleteProduct, getProducts } from "@/services/product";
+import CreateExpenseDialog from "./CreateExpenseDialog";
+import UpdateExpenseDialog from "./UpdateExpenseDialog";
+import { Expense, ExpensesResponse } from "@/types/expense";
+import { deleteExpense, getExpenses } from "@/services/expense";
+import { formatVND } from "@/lib/formatVND";
 
-export default function ProductDetail() {
-  const [items, setItems] = useState<ProductsResponse | null>(null);
+export default function ExpenseDetail() {
+  const [items, setItems] = useState<ExpensesResponse | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const limit = 100;
+  const limit = 12;
 
-  const fetchProducts = async () => {
+  const fetchExpenses = async () => {
     setLoading(true);
     try {
-      const data = await getProducts(false, {
+      const data = await getExpenses(false, {
         page: page,
         limit: limit,
       });
       if (!data || !data.data) {
-        toast.error("Không có dữ liệu sản phẩm");
+        toast.error("Không có dữ liệu chi phí");
         return;
       }
-      console.log(data);
       setItems(data);
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("Error fetching expenses:", error);
     } finally {
       setLoading(false);
     }
   };
   useEffect(() => {
-    fetchProducts();
+    fetchExpenses();
   }, [page]);
 
   return (
     <>
       <div className="flex items-center justify-between px-6 md:px-10 py-4">
         <h1 className="text-[#f5f5f5] text-xl md:text-2xl font-semibold tracking-wide">
-          Quản lý sản phẩm
+          Quản lý chi phí
         </h1>
         <button
           onClick={() => setShowAddDialog(true)}
@@ -64,26 +64,19 @@ export default function ProductDetail() {
               <div
                 key={index}
                 className="bg-[#1f1f1f] p-4 rounded-lg shadow-md 
-  hover:shadow-lg hover:scale-[1.03] hover:-translate-y-1 
-  transition-all duration-300 ease-in-out cursor-pointer"
+                hover:shadow-lg hover:scale-[1.03] hover:-translate-y-1 
+                transition-all duration-300 ease-in-out cursor-pointer"
               >
-                <h2 className="text-[#f5f5f5] text-lg font-semibold mb-1">
-                  {item.name}
+                <h2 className="text-[#f5f5f5] text-lg font-semibold mb-2">
+                  {item.expense_type}
                 </h2>
-
-                {/* Hiển thị tên dịch vụ */}
-                <p className="text-[#8ecae6] text-xs mb-1">
-                  Dịch vụ: {item.service?.name || "Không có"}
-                </p>
-
-                <p className="text-[#ababab] text-sm">
-                  {item.price} VND / {item.unit}
-                </p>
-
+                <p className="text-[#ababab] text-sm">Mô tả: {item.description}</p>
+                <p className="text-[#ababab] text-sm">Ngày chi: {item.expense_date}</p>
+                <p className="text-[#ababab] text-sm">Số tiền: {formatVND(item.amount)}</p>
                 <div className="flex justify-end gap-2 mt-2">
                   <button
                     onClick={() => {
-                      setSelectedProduct(item);
+                      setSelectedExpense(item);
                       setShowUpdateDialog(true);
                     }}
                     className="text-yellow-500 hover:text-yellow-400"
@@ -93,7 +86,7 @@ export default function ProductDetail() {
                   </button>
                   <button
                     onClick={() => {
-                      setSelectedProduct(item);
+                      setSelectedExpense(item);
                       setShowDeleteDialog(true);
                     }}
                     className="text-red-500 hover:text-red-400"
@@ -107,21 +100,21 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      <CreateProductDialog
+      <CreateExpenseDialog
         open={showAddDialog}
         onClose={() => setShowAddDialog(false)}
         onAdd={() => {
-          fetchProducts(); // reload lại list sau khi thêm
+          fetchExpenses(); // reload lại list sau khi thêm
           setShowAddDialog(false); // đóng dialog
         }}
       />
-      {selectedProduct && (
-        <UpdateProductDialog
+      {selectedExpense && (
+        <UpdateExpenseDialog
           open={showUpdateDialog}
           onClose={() => setShowUpdateDialog(false)}
-          product={selectedProduct}
+          expense={selectedExpense}
           onUpdate={() => {
-            fetchProducts();
+            fetchExpenses();
             setShowUpdateDialog(false);
           }}
         />
@@ -142,9 +135,9 @@ export default function ProductDetail() {
               Xác nhận xoá
             </div>
             <p className="text-[#ababab] text-sm">
-              Bạn có chắc muốn xoá dịch vụ:{" "}
+              Bạn có chắc muốn xoá chi phí:{" "}
               <span className="font-semibold text-[#f5f5f5]">
-                {selectedProduct?.name}
+                {selectedExpense?.expense_type}
               </span>
               ?
             </p>
@@ -157,11 +150,11 @@ export default function ProductDetail() {
               </button>
               <button
                 onClick={async () => {
-                  if (!selectedProduct) return;
+                  if (!selectedExpense) return;
                   try {
-                    await deleteProduct(false, selectedProduct.id);
+                    await deleteExpense(false, selectedExpense.id);
                     toast.success("Xoá thành công");
-                    fetchProducts();
+                    fetchExpenses();
                     setShowDeleteDialog(false);
                   } catch (err) {
                     console.error(err);

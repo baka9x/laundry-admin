@@ -29,6 +29,7 @@ export const getPromotions = async (
     return response.data;
   }
 };
+
 export const updatePromotion = async (
   isServer: boolean,
   promotionId: number,
@@ -43,6 +44,7 @@ export const updatePromotion = async (
     return response.data;
   }
 };
+
 export const deletePromotion = async (isServer: boolean, promotionId: number) => {
   if (isServer) {
     await getServerToken();

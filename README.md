@@ -1,5 +1,7 @@
-Viết CRUD trang promotions, thêm promotion vào dialog tạo order. (Tiếp tục)
+TIẾP TỤC VIẾT TRANG CUSTOMER, SỬA CÁC DIALOG VÀ BACKEND CẬP NHẬT TOTAL_AMOUNT
 
-Viết tiếp Notification. Danh sách notification - Thiết kế lại layout
 
-Viết trang chủ: Doanh thu hôm nay so với hôm qua.
+Viết api cập nhật số lần giặt cho customer mỗi khi thanh toán thành công.
+
+
+Viết trang thống kê chi tiết.

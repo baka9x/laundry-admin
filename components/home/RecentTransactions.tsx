@@ -1,3 +1,4 @@
+import { formatVND } from "@/lib/formatVND";
 import { WashOrdersResponse } from "@/types/washOrder";
 import Link from "next/link";
 import React from "react";
@@ -49,12 +50,12 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ data }) => {
                   </p>
                 </div>
                 <div className="flex flex-col items-start gap-2">
-                  <p className="text-green-600 px-4">
+                  <p className="text-green-600">
                     <FaCheckDouble className="inline mr-2" /> {item.status}
                   </p>
                   <p className="text-[#ababab] text-sm flex items-center">
                     <FaCircle className="inline mr-2 text-green-600" />
-                    {item.pickup_time}
+                    {formatVND(item.total_amount)}
                   </p>
                 </div>
               </div>
