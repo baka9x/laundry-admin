@@ -24,6 +24,7 @@ export default function CreateProductDialog({
     name: "",
     price: 0,
     unit: "",
+    type: "",
   });
   const [loading, setLoading] = useState(false);
   const [services, setServices] = useState<Service[]>([]);
@@ -77,6 +78,7 @@ export default function CreateProductDialog({
         name: "",
         price: 0,
         unit: "",
+        type: "",
       });
       onAdd(); // reload list + đóng dialog
     } catch (error) {
@@ -151,6 +153,18 @@ export default function CreateProductDialog({
             <option value="Kg">Kg</option>
             <option value="Đôi">Đôi</option>
             <option value="Lượt">Lượt</option>
+          </select>
+
+          <select
+            value={newProduct.type || ""}
+            onChange={(e) =>
+              setNewProduct({ ...newProduct, type: e.target.value })
+            }
+            className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
+          >
+            <option value="">-- Chọn loại sản phẩm --</option>
+            <option value="wash">Đồ giặt</option>
+            <option value="drink">Đồ uống</option>
           </select>
 
           <div className="flex justify-end gap-2">

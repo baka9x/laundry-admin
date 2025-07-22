@@ -2,14 +2,16 @@ export interface Service {
     id: number;
     name: string;
     description: string;
-    created_at: string; 
-    updated_at: string; 
+    type: "wash" | "drink" | string;
+    created_at: string;
+    updated_at: string;
     products: null;
 }
 
 export interface ServiceInput {
     name: string;
     description: string;
+    type: "wash" | "drink" | string;
 }
 
 export interface ServicesResponse {

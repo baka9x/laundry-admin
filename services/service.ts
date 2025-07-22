@@ -15,7 +15,7 @@ export const createService = async (isServer: false, input: ServiceInput) => {
 
 export const getServices = async (
   isServer = false,
-  params: { page?: number; limit?: number }
+  params: { type?: string, page?: number; limit?: number }
 ): Promise<ServicesResponse> => {
   if (isServer) {
     await getServerToken();

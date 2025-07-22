@@ -63,7 +63,7 @@ export default function UpdateCustomerDialog({
       onClose();
     } catch (error) {
       console.error("Error updating customer:", error);
-      toast.error("Cập nhật khách hàng thất bại");
+      toast.error(`Cập nhật khách hàng thất bại - ${(error as any).response.data?.error || "Lỗi không xác định"}`);
     } finally {
       setLoading(false);
     }
@@ -131,31 +131,34 @@ export default function UpdateCustomerDialog({
             }
             className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
           />
-          <label className="block mb-1 mt-2 text-sm">Cấp bậc</label>
-          <input
-            type="number"
-            value={customerInput.priority_level || 0}
+          
+          <label className="block mb-1 mt-2 text-sm">Kiểu khách hàng</label>
+          <select
+            value={customerInput.priority_level}
             onChange={(e) =>
               setCustomerInput({
                 ...customerInput,
-                priority_level: Number(e.target.value),
+                priority_level: Number(e.target.value) as 0 | 1,
               })
             }
-            className="w-full px-3 py-2 rounded bg-[#1f1ff] text-[#f5f5f5] border border-[#444] focus:outline-none"
-          />
+            className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
+          >
+            <option value="0">Khách hàng bình thường</option>
+            <option value="1">Khách hàng thân thiết</option>
+          </select>
 
           <div className="flex gap-2 mt-4">
             <button
               onClick={handleUpdate}
               disabled={loading}
-              className="flex-1 px-3 py-1 bg-yellow-500 text-[#1f1f1f] font-semibold rounded hover:bg-yellow-600 transition-all"
+              className="flex-1 p-2 bg-yellow-500 text-[#1f1f1f] font-semibold rounded hover:bg-yellow-600 transition-all"
             >
               {loading ? "Đang cập nhật..." : "Cập nhật"}
             </button>
             <button
               onClick={onClose}
               disabled={loading}
-              className="flex-1 px-3 py-1 bg-[#444] text-[#f5f5f5] rounded"
+              className="flex-1 p-2 bg-gray-500 text-[#f5f5f5] font-semibold rounded hover:bg-gray-600 transition-all"
             >
               Huỷ
             </button>

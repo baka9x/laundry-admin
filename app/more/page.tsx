@@ -4,7 +4,8 @@ import Link from "next/link";
 
 const features = [
   { title: "Dịch vụ", description: "Quản lý dịch vụ giặt ủi và đồ uống", href: "/services" },
-  { title: "Sản phẩm", description: "Quản lý sản phẩm", href: "/products" },
+  { title: "Sản phẩm giặt", description: "Quản lý sản phẩm giặt sấy", href: "/wash-products" },
+  { title: "Sản phẩm đồ uống", description: "Quản lý sản phẩm đồ uống, coffee, nước ngọt", href: "/drink-products" },
   { title: "Khuyến mại", description: "Quản lý chương trình khuyến mại", href: "/promotions" },
   { title: "Chi phí", description: "Theo dõi và quản lý chi phí", href: "/expenses" },
   { title: "Khách hàng", description: "Quản lý thông tin khách hàng", href: "/customers" },

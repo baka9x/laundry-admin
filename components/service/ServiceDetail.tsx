@@ -69,6 +69,7 @@ export default function ServiceDetail() {
                 <h2 className="text-[#f5f5f5] text-lg font-semibold mb-2">
                   {item.name}
                 </h2>
+                <p className="text-[#8ecae6] font-bold text-sm mb-2">{`${item.type === 'wash' ? 'Dịch vụ giặt' : 'Dịch vụ đồ uống'}`}</p>
                 <p className="text-[#ababab] text-sm">{item.description}</p>
 
                 <div className="flex justify-end gap-2 mt-2">

@@ -26,6 +26,7 @@ export default function UpdatePromotionDialog({
     discount_value: 0,
     min_order_value: 0,
     priority_level_required: 0,
+    total_washes_required: 0,
     start_date: new Date(),
     end_date: new Date(),
     is_active: true,
@@ -42,12 +43,13 @@ export default function UpdatePromotionDialog({
         discount_value: promotion.discount_value,
         min_order_value: promotion.min_order_value,
         priority_level_required: promotion.priority_level_required ?? 0,
+        total_washes_required: promotion.total_washes_required ?? 0,
         start_date: new Date(promotion.start_date),
         end_date: new Date(promotion.end_date),
         is_active: promotion.is_active,
       });
-      setStartDate(new Date(promotion.start_date).toISOString().slice(0,16));
-      setEndDate(new Date(promotion.end_date).toISOString().slice(0,16));
+      setStartDate(new Date(promotion.start_date).toISOString().slice(0, 16));
+      setEndDate(new Date(promotion.end_date).toISOString().slice(0, 16));
     }
   }, [promotion]);
 
@@ -135,18 +137,35 @@ export default function UpdatePromotionDialog({
             }
             className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
           />
-          <label className="block mb-1 mt-2 text-sm">Yêu cầu VIP</label>
-          <input
-            type="number"
+          <label className="block mb-1 mt-2 text-sm">Kiểu khách hàng</label>
+          <select
             value={promotionInput.priority_level_required}
             onChange={(e) =>
               setPromotionInput({
                 ...promotionInput,
-                priority_level_required: Number(e.target.value),
+                priority_level_required: Number(e.target.value) as 0 | 1,
+              })
+            }
+            className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
+          >
+            <option value="0">Khách hàng bình thường</option>
+            <option value="1">Khách hàng thân thiết</option>
+          </select>
+
+          <label className="block mb-1 mt-2 text-sm">Số lần giặt</label>
+          <input
+            type="number"
+            placeholder="Số lần giặt cần thiết"
+            value={promotionInput.total_washes_required}
+            onChange={(e) =>
+              setPromotionInput({
+                ...promotionInput,
+                total_washes_required: Number(e.target.value),
               })
             }
             className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
           />
+
           <div className="flex flex-col mt-2 mb-1 md:flex-row gap-2">
             <div className="flex flex-col flex-1">
               <label className="mb-1 text-sm">Ngày bắt đầu</label>
@@ -184,14 +203,14 @@ export default function UpdatePromotionDialog({
             <button
               onClick={handleUpdate}
               disabled={loading}
-              className="flex-1 px-3 py-1 bg-yellow-500 text-[#1f1f1f] font-semibold rounded hover:bg-yellow-600 transition-all"
+              className="flex-1 p-2 bg-yellow-500 text-[#1f1f1f] font-semibold rounded hover:bg-yellow-600 transition-all"
             >
               {loading ? "Đang cập nhật..." : "Cập nhật"}
             </button>
             <button
               onClick={onClose}
               disabled={loading}
-              className="flex-1 px-3 py-1 bg-[#444] text-[#f5f5f5] rounded"
+              className="flex-1 p-2 bg-gray-500 text-[#f5f5f5] font-semibold rounded hover:bg-gray-600 transition-all"
             >
               Huỷ
             </button>

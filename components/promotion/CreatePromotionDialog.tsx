@@ -24,6 +24,7 @@ export default function CreatePromotionDialog({
     discount_value: 0,
     min_order_value: 0,
     priority_level_required: 0,
+    total_washes_required: 0,
     start_date: new Date(),
     end_date: new Date(),
     is_active: true,
@@ -45,6 +46,7 @@ export default function CreatePromotionDialog({
         discount_value: newPromotion.discount_value,
         min_order_value: newPromotion.min_order_value,
         priority_level_required: newPromotion.priority_level_required,
+        total_washes_required: newPromotion.total_washes_required,
         start_date: new Date(startDate),
         end_date: new Date(endDate),
         is_active: newPromotion.is_active,
@@ -56,6 +58,7 @@ export default function CreatePromotionDialog({
         discount_value: 0,
         min_order_value: 0,
         priority_level_required: 0,
+        total_washes_required: 0,
         start_date: new Date(),
         end_date: new Date(),
         is_active: true,
@@ -137,15 +140,30 @@ export default function CreatePromotionDialog({
             className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
           />
 
-          <label className="block mb-1 mt-2 text-sm">Yêu cầu VIP</label>
-          <input
-            type="number"
-            placeholder="Yêu cầu VIP"
+          <label className="block mb-1 mt-2 text-sm">Kiểu khách hàng</label>
+          <select
             value={newPromotion.priority_level_required}
             onChange={(e) =>
               setNewPromotion({
                 ...newPromotion,
-                priority_level_required: Number(e.target.value),
+                priority_level_required: Number(e.target.value) as 0 | 1,
+              })
+            }
+            className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
+          >
+            <option value="0">Khách hàng bình thường</option>
+            <option value="1">Khách hàng thân thiết</option>
+          </select>
+
+          <label className="block mb-1 mt-2 text-sm">Số lần giặt</label>
+          <input
+            type="number"
+            placeholder="Số lần giặt cần thiết"
+            value={newPromotion.total_washes_required}
+            onChange={(e) =>
+              setNewPromotion({
+                ...newPromotion,
+                total_washes_required: Number(e.target.value),
               })
             }
             className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
@@ -190,14 +208,14 @@ export default function CreatePromotionDialog({
             <button
               onClick={handleAdd}
               disabled={loading}
-              className="flex-1 px-3 py-1 bg-yellow-500 text-[#1f1f1f] font-semibold rounded hover:bg-yellow-600 transition-all"
+              className="flex-1 p-2 bg-yellow-500 text-[#1f1f1f] font-semibold rounded hover:bg-yellow-600 transition-all"
             >
               {loading ? "Đang thêm..." : "Thêm"}
             </button>
             <button
               onClick={onClose}
               disabled={loading}
-              className="flex-1 px-3 py-1 bg-[#444] text-[#f5f5f5] rounded"
+              className="flex-1 p-2 bg-gray-500 text-[#f5f5f5] font-semibold rounded hover:bg-gray-600 transition-all"
             >
               Huỷ
             </button>

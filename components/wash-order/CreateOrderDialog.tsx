@@ -377,13 +377,13 @@ export default function CreateOrderDialog({
         <div className="flex gap-2">
           <button
             onClick={handleCreateOrder}
-            className="flex-1 bg-[#f6b100] p-2 rounded font-semibold"
+            className="flex-1 p-2 bg-yellow-500 text-[#1f1f1f] font-semibold rounded hover:bg-yellow-600 transition-all"
           >
             Tạo đơn
           </button>
           <button
             onClick={onClose}
-            className="flex-1 bg-gray-500 p-2 rounded font-semibold"
+            className="flex-1 p-2 bg-gray-500 text-[#f5f5f5] font-semibold rounded hover:bg-gray-600 transition-all"
           >
             Huỷ
           </button>

@@ -9,6 +9,7 @@ import CreateCustomerDialog from "./CreateCustomerDialog";
 import UpdateCustomerDialog from "./UpdateCustomerDialog";
 import { Customer, CustomersResponse } from "@/types/customer";
 import { deleteCustomer, getCustomers } from "@/services/customer";
+import { formatVND } from "@/lib/formatVND";
 
 export default function CustomerDetail() {
   const [items, setItems] = useState<CustomersResponse | null>(null);
@@ -71,21 +72,28 @@ export default function CustomerDetail() {
                 <h2 className="text-[#f5f5f5] text-lg font-semibold mb-2">
                   {item.phone} ({item.name})
                 </h2>
-                <p className="text-[#ababab] text-sm">
-                  Địa chỉ: {item.address}
-                </p>
-                <p className="text-[#ababab] text-sm">
-                  Ghi chú: {item.note}
-                </p>
-                <p className="text-[#ababab] text-sm">
-                  Ngày tạo: {item.created_at}
-                </p>
-                <p className="text-[#ababab] text-sm">
-                  Số lần giặt: {item.total_washes || 0}
-                </p>
-                <p className="text-[#ababab] text-sm">
-                  Cấp bậc: {item.priority_level}
-                </p>
+                <div className="grid grid-cols-2 gap-y-2 text-sm max-w-md">
+                  <div className="text-[#ababab] font-medium">Địa chỉ:</div>
+                  <div className="text-[#f5f5f5]">{item.address}</div>
+
+                  <div className="text-[#ababab] font-medium">Ngày tạo:</div>
+                  <div className="text-[#f5f5f5]">{new Date(item.created_at).toLocaleString()}</div>
+                  <div className="text-[#ababab] font-medium">Tổng lần giặt:</div>
+                  <div className="text-[#f5f5f5] font-bold">{item.total_washes || 0}</div>
+                  <div className="text-[#ababab] font-medium">Số lần giặt gần nhất:</div>
+                  <div className="text-[#f5f5f5] font-bold">{item.wash_cycle || 0}</div>
+                  <div className="text-[#ababab] font-medium">Tổng chi tiêu:</div>
+                  <div className="text-[#f5f5f5] font-bold">{formatVND(item.total_spent)}</div>
+                  <div className="text-[#ababab] font-medium">Kiểu khách hàng:</div>
+                  <div
+                    className={`font-semibold ${item.role_id === 1 ? "text-green-600" : "text-gray-400"
+                      }`}
+                  >
+                    {item.role_id ? "Thường" : "Thân thiết"}
+                  </div>
+                  <div className="text-[#ababab] font-medium">Ghi chú:</div>
+                  <div className="text-[#f5f5f5]">{item.note}</div>
+                </div>
                 <div className="flex justify-end gap-2 mt-2">
                   <button
                     onClick={() => {
@@ -148,7 +156,7 @@ export default function CustomerDetail() {
               Xác nhận xoá
             </div>
             <p className="text-[#ababab] text-sm">
-              Bạn có chắc muốn xoá khuyến mại:{" "}
+              Bạn có chắc muốn xoá khách hàng:{" "}
               <span className="font-semibold text-[#f5f5f5]">
                 {selectedCustomer?.name}
               </span>

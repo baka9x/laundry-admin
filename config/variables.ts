@@ -13,7 +13,7 @@ export const statusOptions = [
   { value: "", label: "Tất cả" },
   { value: "pending", label: "Đang chờ" },
   { value: "processing", label: "Đang xử lý" },
-  { value: "completed", label: "Đã xong" },
+  { value: "completed", label: "Đã giặt xong" },
   { value: "deliveried", label: "Đã thanh toán" },
   { value: "cancelled", label: "Đã huỷ" },
 ];

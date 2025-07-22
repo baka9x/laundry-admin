@@ -120,25 +120,25 @@ export default function UpdateExpenseDialog({
                 className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
               />
     
-              <label className="block mb-1 mt-2 text-sm">Ngày mua</label>
+              <label className="block mb-1 mt-2 text-sm">Ngày thanh toán</label>
               <input
                 type="datetime-local"
                 value={expenseTime}
                 onChange={(e) => setExpenseTime(e.target.value)}
-                className="p-2 rounded bg-[#343434] text-white"
+                className="w-full p-2 rounded bg-[#343434] text-white"
               />
               <div className="flex gap-2 mt-6">
                 <button
                   onClick={handleUpdate}
                   disabled={loading}
-                  className="flex-1 px-3 py-1 bg-yellow-500 text-[#1f1f1f] font-semibold rounded hover:bg-yellow-600 transition-all"
+                  className="flex-1 p-2 bg-yellow-500 text-[#1f1f1f] font-semibold rounded hover:bg-yellow-600 transition-all"
                 >
                   {loading ? "Đang sửa..." : "Cập nhật"}
                 </button>
                 <button
                   onClick={onClose}
                   disabled={loading}
-                  className="flex-1 px-3 py-1 bg-[#444] text-[#f5f5f5] rounded"
+                  className="flex-1 p-2 bg-gray-500 text-[#f5f5f5] font-semibold rounded hover:bg-gray-600 transition-all"
                 >
                   Huỷ
                 </button>

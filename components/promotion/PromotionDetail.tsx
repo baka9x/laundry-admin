@@ -9,6 +9,7 @@ import { Promotion, PromotionsResponse } from "@/types/promotion";
 import { deletePromotion, getPromotions } from "@/services/promotion";
 import CreatePromotionDialog from "./CreatePromotionDialog";
 import UpdatePromotionDialog from "./UpdatePromotionDialog";
+import { formatVND } from "@/lib/formatVND";
 
 export default function PromotionDetail() {
   const [items, setItems] = useState<PromotionsResponse | null>(null);
@@ -71,25 +72,39 @@ export default function PromotionDetail() {
                 <h2 className="text-[#f5f5f5] text-lg font-semibold mb-2">
                   {item.name}
                 </h2>
-                <p className="text-[#ababab] text-sm">
-                  {item.discount_type} : {item.discount_value}
-                </p>
-                <p className="text-[#ababab] text-sm">
-                  Min order: {item.min_order_value}
-                </p>
-                <p className="text-[#ababab] text-sm">
-                  Ngày bắt đầu: {item.start_date}
-                </p>
-                <p className="text-[#ababab] text-sm">
-                  Ngày kết thúc: {item.end_date}
-                </p>
-                <p className="text-[#ababab] text-sm">
-                  Yêu cầu VIP: {item.priority_level_required}
-                </p>
-                <p className="text-[#ababab] text-sm">
-                  Trạng thái:{" "}
-                  {item.is_active ? "Đang kích hoạt" : "Không kích hoạt"}
-                </p>
+                <div className="grid grid-cols-2 gap-y-2 text-sm max-w-md">
+                  <div className="text-[#ababab] font-medium">Giá trị giảm:</div>
+                  <div className="text-[#f5f5f5] font-semibold">
+                    {item.discount_value}
+                    {item.discount_type === "percentage" ? "%" : " đ"}
+                  </div>
+
+                  <div className="text-[#ababab] font-medium">Min order:</div>
+                  <div className="text-[#f5f5f5]">{formatVND(item.min_order_value)}</div>
+
+                  <div className="text-[#ababab] font-medium">Ngày bắt đầu:</div>
+                  <div className="text-[#f5f5f5]">{new Date(item.start_date).toLocaleString()}</div>
+
+                  <div className="text-[#ababab] font-medium">Ngày kết thúc:</div>
+                  <div className="text-[#f5f5f5]">{new Date(item.end_date).toLocaleString()}</div>
+
+                  <div className="text-[#ababab] font-medium">Loại khách hàng:</div>
+                  <div className="text-[#f5f5f5]">
+                    {item.priority_level_required === 0 ? "Thường" : "Thân thiết"}
+                  </div>
+
+                  <div className="text-[#ababab] font-medium">Số lần giặt:</div>
+                  <div className="text-[#f5f5f5]">{item.total_washes_required}</div>
+
+                  <div className="text-[#ababab] font-medium">Trạng thái:</div>
+                  <div
+                    className={`font-semibold ${item.is_active ? "text-green-600" : "text-red-500"
+                      }`}
+                  >
+                    {item.is_active ? "Đang kích hoạt" : "Không kích hoạt"}
+                  </div>
+                </div>
+
                 <div className="flex justify-end gap-2 mt-2">
                   <button
                     onClick={() => {

@@ -1,5 +1,5 @@
 import BottomNav from "@/components/layout/BottomNav";
-import ProductDetail from "@/components/product/ProductDetail";
+import ProductDetail from "@/components/wash-product/ProductDetail";
 //import { getUserProfile } from "@/services/user";
 //import { User } from "@/types/user";
 
