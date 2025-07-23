@@ -85,7 +85,7 @@ export default function CreateExpenseDialog({
           <input
             type="text"
             placeholder="Mô tả chi tiết"
-            value={newExpense.description}
+            value={newExpense.description || ""}
             onChange={(e) =>
               setNewExpense({ ...newExpense, description: e.target.value })
             }

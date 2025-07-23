@@ -1,19 +1,15 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { BsFillFileEarmarkPlusFill } from "react-icons/bs";
 import { CiCircleMore } from "react-icons/ci";
 import { FaHome } from "react-icons/fa";
 import { LuWashingMachine } from "react-icons/lu";
 import { RiDrinks2Fill } from "react-icons/ri";
 import clsx from "clsx";
-import { useState } from "react";
-import CreateOrderDialog from "../wash-order/CreateOrderDialog";
-import WashOrderDetail from "../wash-order/WashOrderDetail";
+
 
 export default function BottomNav() {
-  const [showDialog, setShowDialog] = useState(false);
-  const [refresh, setRefresh] = useState(false);
+  
   const router = useRouter();
   const pathname = usePathname();
 

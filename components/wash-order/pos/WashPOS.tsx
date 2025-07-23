@@ -21,6 +21,7 @@ import { getProducts } from "@/services/product";
 import { formatVND } from "@/lib/formatVND";
 import InvoiceModal from "../InvoiceModal";
 import { createNotification } from "@/services/notification";
+import { updateCustomerWashes } from "@/services/customer";
 
 interface Props {
   order: WashOrderDetailResponse;
@@ -39,6 +40,7 @@ export default function WashPOS({ order, products }: Props) {
   const fetchProductsByService = async (serviceId: number | null) => {
     try {
       const res = await getProducts(false, {
+        type: "wash",
         service_id: serviceId ?? undefined,
         limit: 100,
       });
@@ -51,7 +53,7 @@ export default function WashPOS({ order, products }: Props) {
 
   const fetchServices = async () => {
     try {
-      const res = await getServices(false, { limit: 20 });
+      const res = await getServices(false, { type: "wash", limit: 20 });
       if (!res) {
         return;
       }
@@ -145,12 +147,13 @@ export default function WashPOS({ order, products }: Props) {
           subtotal: item.subtotal,
         });
       }
-
       await updateWashOrderTotalPrice(order.id, total);
+      await updateWashOrderStatus(order.id, "deliveried");
+      await updateCustomerWashes(false, order.customer.id, total);
       toast.success("Đã thanh toán thành công!");
       setShowInvoice(true); // mở dialog
       // router.refresh(); // vẫn có thể refresh sau
-      await updateWashOrderStatus(order.id, "deliveried");
+      
       await createNotification(false, {
         title: `Đơn hàng #${order.id} - ${order.customer.phone} (${order.customer.name}) đã thanh toán và giao cho khách.`,
         content: `Đơn hàng #${order.id} - 
@@ -375,7 +378,7 @@ export default function WashPOS({ order, products }: Props) {
           onClose={() => {
             setShowInvoice(false);
             clearOrder();
-            router.refresh();
+            router.push("/wash-order");
           }}
           items={localItems}
           subtotal={subtotal}

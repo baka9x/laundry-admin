@@ -89,12 +89,11 @@ export default function PromotionDetail() {
                   <div className="text-[#f5f5f5]">{new Date(item.end_date).toLocaleString()}</div>
 
                   <div className="text-[#ababab] font-medium">Loại khách hàng:</div>
-                  <div className="text-[#f5f5f5]">
-                    {item.priority_level_required === 0 ? "Thường" : "Thân thiết"}
+                  <div className="text-red-300 font-bold">
+                    {item.customer_role.name}
                   </div>
-
                   <div className="text-[#ababab] font-medium">Số lần giặt:</div>
-                  <div className="text-[#f5f5f5]">{item.total_washes_required}</div>
+                  <div className="text-yellow-500 font-bold">{item.recent_orders_required}</div>
 
                   <div className="text-[#ababab] font-medium">Trạng thái:</div>
                   <div

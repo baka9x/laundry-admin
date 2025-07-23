@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { ProductInput } from "@/types/product";
 import { Service } from "@/types/service";
 import { createNotification } from "@/services/notification";
+import { IoClose } from "react-icons/io5";
 
 interface CreateProductDialogProps {
   open: boolean;
@@ -24,7 +25,6 @@ export default function CreateProductDialog({
     name: "",
     price: 0,
     unit: "",
-    type: "",
   });
   const [loading, setLoading] = useState(false);
   const [services, setServices] = useState<Service[]>([]);
@@ -39,7 +39,7 @@ export default function CreateProductDialog({
 
   const fetchServices = async () => {
     try {
-      const res = await getServices(false, { page: 1, limit: 100 });
+      const res = await getServices(false, { type: "drink", page: 1, limit: 100 });
       if (res && res.data) {
         setServices(res.data);
       }
@@ -78,7 +78,6 @@ export default function CreateProductDialog({
         name: "",
         price: 0,
         unit: "",
-        type: "",
       });
       onAdd(); // reload list + đóng dialog
     } catch (error) {
@@ -90,17 +89,22 @@ export default function CreateProductDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} className="relative z-50">
-      <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
-        aria-hidden="true"
-      />
-      <div className="fixed inset-0 flex items-center justify-center p-4">
-        <div className="bg-[#2a2a2a] p-6 rounded-xl shadow-xl w-80 space-y-4">
-          <div className="text-[#f5f5f5] text-lg font-semibold">
-            Thêm sản phẩm
-          </div>
-
+    <Dialog
+      open={open}
+      onClose={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+    >
+      <div className="bg-[#262626] text-white rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4 z-10">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-[#f6b100]">
+            Tạo sản phẩm mới
+          </h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
+            <IoClose size={24} />
+          </button>
+        </div>
+        <div>
+          <label className="block mb-1 mt-2 text-sm">Chọn dịch vụ</label>
           <select
             value={newProduct.service_id}
             onChange={(e) =>
@@ -118,7 +122,7 @@ export default function CreateProductDialog({
               </option>
             ))}
           </select>
-
+          <label className="block mb-1 text-sm">Tên sản phẩm</label>
           <input
             type="text"
             placeholder="Tên sản phẩm"
@@ -129,15 +133,21 @@ export default function CreateProductDialog({
             className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
           />
 
+          <label className="block mb-1 mt-2 text-sm">Giá sản phẩm (đ)</label>
           <input
             type="number"
-            placeholder="Giá"
+            placeholder="Giá sản phẩm (đ)"
             value={newProduct.price}
             onChange={(e) =>
-              setNewProduct({ ...newProduct, price: Number(e.target.value) })
+              setNewProduct({
+                ...newProduct,
+                price: Number(e.target.value),
+              })
             }
             className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
           />
+
+          <label className="block mb-1 mt-2 text-sm">Chọn đơn vị</label>
 
           <select
             value={newProduct.unit}
@@ -147,40 +157,26 @@ export default function CreateProductDialog({
             className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
           >
             <option value="">-- Chọn đơn vị --</option>
-            <option value="Cái">Cái</option>
-            <option value="Lần">Lần</option>
-            <option value="Con">Con</option>
-            <option value="Kg">Kg</option>
-            <option value="Đôi">Đôi</option>
-            <option value="Lượt">Lượt</option>
+            <option value="Ly">Ly</option>
+            <option value="Cốc">Cốc</option>
+            <option value="Chai">Chai</option>
+            <option value="Hộp">Hộp</option>
           </select>
 
-          <select
-            value={newProduct.type || ""}
-            onChange={(e) =>
-              setNewProduct({ ...newProduct, type: e.target.value })
-            }
-            className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
-          >
-            <option value="">-- Chọn loại sản phẩm --</option>
-            <option value="wash">Đồ giặt</option>
-            <option value="drink">Đồ uống</option>
-          </select>
-
-          <div className="flex justify-end gap-2">
-            <button
-              onClick={onClose}
-              disabled={loading}
-              className="px-3 py-1 bg-[#444] text-[#f5f5f5] rounded"
-            >
-              Huỷ
-            </button>
+          <div className="flex gap-2 mt-4">
             <button
               onClick={handleAdd}
               disabled={loading}
-              className="px-3 py-1 bg-yellow-500 text-[#1f1f1f] font-semibold rounded hover:bg-yellow-600 transition-all"
+              className="flex-1 p-2 bg-yellow-500 text-[#1f1f1f] font-semibold rounded hover:bg-yellow-600 transition-all"
             >
               {loading ? "Đang thêm..." : "Thêm"}
+            </button>
+            <button
+              onClick={onClose}
+              disabled={loading}
+              className="flex-1 p-2 bg-gray-500 text-[#f5f5f5] font-semibold rounded hover:bg-gray-600 transition-all"
+            >
+              Huỷ
             </button>
           </div>
         </div>

@@ -11,12 +11,14 @@ import { NotificationsResponse } from "@/types/notification";
 import {
   countUnreadNotifications,
   deleteNotification,
+  deleteReadNotification,
   getNotifications,
   markNotificationAsRead,
 } from "@/services/notification";
 import NotificationBadge from "../ui/NotificationBadge";
 import { WashOrdersResponse } from "@/types/washOrder";
 import { getWashOrders } from "@/services/washOrder";
+import toast from "react-hot-toast";
 
 interface HeaderProps {
   data: User;
@@ -54,6 +56,16 @@ const Header: React.FC<HeaderProps> = ({ data }) => {
       console.error("Error fetching data:", error);
     }
   };
+
+  const handleDeleteReadNotification = async () => {
+    try {
+      await deleteReadNotification(false);
+      fetchAll();
+      toast.success("Đã xoá tất cả thông báo đã đọc");
+    } catch (error) {
+      console.error("Error delete notification:", error);
+    }
+  }
 
   const handleDeleteNotification = async (id: number) => {
     try {
@@ -127,6 +139,12 @@ const Header: React.FC<HeaderProps> = ({ data }) => {
                   <FaBell /> Hôm nay: {washOrders ? washOrders.total : 0} đơn
                   giặt mới
                 </li>
+                <button 
+                onClick={() => {
+                  handleDeleteReadNotification();
+                }}
+                
+                className="bg-[#222] font-bold text-red-500 w-full px-1 py-2 cursor-pointer hover:bg-[#333]">Xoá tất cả thông báo</button>
                 {notifications?.data?.length ? (
                   notifications.data.map((notification) => (
                     <li
@@ -136,11 +154,10 @@ const Header: React.FC<HeaderProps> = ({ data }) => {
                         }
                       }}
                       key={notification.id}
-                      className={`flex justify-between ${
-                        !notification.is_read
+                      className={`flex justify-between ${!notification.is_read
                           ? "bg-[#3f3f3f] cursor-pointer font-bold"
                           : ""
-                      } items-center px-4 py-2 border-b border-[#444]`}
+                        } items-center px-4 py-2 border-b border-[#444]`}
                     >
                       <NotificationBadge type={notification.type} />
                       <span className="ml-2 flex-1 tracking-wide">

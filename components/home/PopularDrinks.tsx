@@ -2,20 +2,20 @@ import { CustomersResponse } from "@/types/customer";
 import Link from "next/link";
 import React from "react";
 
-type PopularCustomersProps = {
+type PopularDrinksProps = {
   data: CustomersResponse;
 };
 
-const PopularCustomers: React.FC<PopularCustomersProps> = ({ data }) => {
+const PopularDrinks: React.FC<PopularDrinksProps> = ({ data }) => {
   return (
     <div>
-      <div className="bg-[#1a1a1a] w-full rounded-lg mb-4">
+      <div className="bg-[#1a1a1a] w-full rounded-lg">
         <div className="flex items-center justify-between px-6 py-4">
           <h3 className="text-[#f5f5f5] text-lg font-semibold tracking-wide">
-            Khách hàng phổ biến
+            Đồ uống phổ biến
           </h3>
           <Link
-            href="/customers"
+            href="/drink-order"
             className="text-[#025cca] text-sm font-semibold"
           >
             Xem tất cả
@@ -58,4 +58,4 @@ const PopularCustomers: React.FC<PopularCustomersProps> = ({ data }) => {
   );
 };
 
-export default PopularCustomers;
+export default PopularDrinks;

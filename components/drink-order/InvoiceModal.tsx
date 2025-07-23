@@ -17,7 +17,7 @@ interface InvoiceModalProps {
   subtotal: number;
   discount: number;
   total: number;
-  orderId: number;
+  orderId: number | null;
   customerName: string;
   customerPhone: string;
 }

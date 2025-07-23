@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import { IoClose } from "react-icons/io5";
 import { Customer, CustomerInput } from "@/types/customer";
 import { updateCustomer } from "@/services/customer";
+import { CustomerRole } from "@/types/customerRole";
+import { getCustomerRoles } from "@/services/customerRole";
 
 interface UpdateCustomerDialogProps {
   open: boolean;
@@ -25,24 +27,41 @@ export default function UpdateCustomerDialog({
     name: "",
     address: "",
     note: "",
-    priority_level: 0,
-    total_washes: 0
+    role_id: 1,
+    total_orders: 0,
+    total_spent: 0,
+    recent_orders: 0,
   });
   const [loading, setLoading] = useState(false);
+  const [customerRoles, setCustomerRoles] = useState<CustomerRole[]>([]);
 
   useEffect(() => {
     if (customer) {
+      fetchCustomerRoles();
       setCustomerInput({
         phone: customer.phone,
         name: customer.name,
         address: customer.address || "",
         note: customer.note || "",
-        priority_level: customer.priority_level || 0,
-        total_washes: customer.total_washes || 0,
-
+        role_id: customer.role_id || 1,
+        total_orders: customer.total_orders || 0,
+        total_spent: customer.total_spent || 0,
+        recent_orders: customer.recent_orders || 0, 
       });
     }
   }, [customer]);
+
+  const fetchCustomerRoles = async () => {
+    try {
+      const res = await getCustomerRoles(false, { page: 1, limit: 100 });
+      if (res && res.data) {
+        setCustomerRoles(res.data);
+      }
+    } catch (error) {
+      console.error("Error fetching customer roles:", error);
+      toast.error("Không lấy được danh sách danh hiệu khách hàng");
+    }
+  };
 
   const handleUpdate = async () => {
     if (customer.phone.trim() === "") {
@@ -122,29 +141,34 @@ export default function UpdateCustomerDialog({
           <label className="block mb-1 mt-2 text-sm">Số lần giặt</label>
           <input
             type="number"
-            value={customerInput.total_washes || 0}
+            value={customerInput.total_orders || 0}
             onChange={(e) =>
               setCustomerInput({
                 ...customerInput,
-                total_washes: Number(e.target.value),
+                total_orders: Number(e.target.value),
               })
             }
             className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
           />
-          
-          <label className="block mb-1 mt-2 text-sm">Kiểu khách hàng</label>
+
+          <label className="block mb-1 mt-2 text-sm">Danh hiệu</label>
           <select
-            value={customerInput.priority_level}
+            value={customerInput.role_id}
             onChange={(e) =>
               setCustomerInput({
                 ...customerInput,
-                priority_level: Number(e.target.value) as 0 | 1,
+                role_id: Number(e.target.value),
               })
             }
             className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
           >
-            <option value="0">Khách hàng bình thường</option>
-            <option value="1">Khách hàng thân thiết</option>
+            {
+              customerRoles.map((role) => (
+                <option key={role.id} value={role.id}>
+                  {role.name}
+                </option>
+              ))
+            }
           </select>
 
           <div className="flex gap-2 mt-4">

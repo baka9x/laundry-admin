@@ -198,19 +198,20 @@ export default function WashOrderDetail() {
                   </div>
                 </div>
                 <h3 className="text-[#f5f5f5] text-base font-semibold mb-2 truncate">
-                  SĐT: {item.customer_phone}
+                  SĐT: {item.customer_phone} ({item.customer_name})
                 </h3>
-                <div className="text-[#ababab] text-sm space-y-1">
-                  <p>Tên KH: {item.customer_name}</p>
-                  <p>Ngày đặt: {new Date(item.order_date).toLocaleString()}</p>
-                  <p>
-                    Ngày giao:{" "}
-                    {item.pickup_time
-                      ? new Date(item.pickup_time).toLocaleString()
-                      : "N/A"}
-                  </p>
-                  <p>Tổng giá tiền: {formatVND(item.total_amount)}</p>
+                <div className="grid grid-cols-2 gap-y-2 text-sm max-w-md">
+                  <div className="text-[#ababab] font-medium">Ngày đặt hàng:</div>
+                  <div className="text-[#f5f5f5]">{new Date(item.order_date).toLocaleString()}</div>
+                  <div className="text-[#ababab] font-medium">Ngày giao:</div>
+                  <div className="text-[#f5f5f5]">{item.pickup_time
+                    ? new Date(item.pickup_time).toLocaleString()
+                    : "N/A"}</div>
+                  <div className="text-[#ababab] font-medium">Tổng giá tiền:</div>
+                  <div className="text-red-300 font-bold">{formatVND(item.total_amount)}</div>
+                  {/* <div className="text-[#f5f5f5]">{item.note}</div> */}
                 </div>
+
                 <div className="mt-4 flex justify-end gap-2">
                   {item.status !== "deliveried" &&
                     item.status === "completed" && (
@@ -263,9 +264,9 @@ export default function WashOrderDetail() {
       <button
         onClick={() => setShowAddDialog(true)}
         suppressHydrationWarning
-        className="absolute bottom-20 sm:bottom-20 left-1/2 transform -translate-x-1/2 bg-[#f6b100] text-white rounded-full p-4 shadow-lg"
+        className="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-[#f6b100] border-2 border-yellow-600 text-white rounded-full p-4 shadow-lg cursor-pointer"
       >
-        <BsFillFileEarmarkPlusFill size={28} />
+        <BsFillFileEarmarkPlusFill size={30} />
       </button>
       <CreateOrderDialog
         isOpen={showAddDialog}

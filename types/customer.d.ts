@@ -7,11 +7,11 @@ export interface Customer {
     address: string;
     role_id: number;
     customer_role: CustomerRole;
-    total_washes: number;
+    total_orders: number;
     last_wash_date: string;
     total_spent: number;
     note: string;
-    wash_cycle: number;
+    recent_orders: number;
     created_at: string;
     updated_at: string;
 }
@@ -22,10 +22,11 @@ export interface CustomerInput {
     address: string;
     role_id?: number;
     note?: string;
-    total_washes?: number;
+    total_orders?: number;
     total_spent?: number;
-    wash_cycle?: number; // Số lần giặt
+    recent_orders?: number; // Số lần giặt
 }
+
 
 export interface CustomersResponse {
     data: Customer[];
@@ -43,7 +44,7 @@ export interface NewCustomerResponse {
     message: string;
     status: string;
     priority_level: number;
-    total_washes: number;
+    total_orders: number;
     note: string | null;
     created_at: string;
     updated_at: string;

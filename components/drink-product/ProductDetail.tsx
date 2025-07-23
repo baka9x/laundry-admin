@@ -9,6 +9,7 @@ import CreateProductDialog from "./CreateProductDialog";
 import UpdateProductDialog from "./UpdateProductDialog";
 import { Product, ProductsResponse } from "@/types/product";
 import { deleteProduct, getProducts } from "@/services/product";
+import { formatVND } from "@/lib/formatVND";
 
 export default function ProductDetail() {
   const [items, setItems] = useState<ProductsResponse | null>(null);
@@ -24,6 +25,7 @@ export default function ProductDetail() {
     setLoading(true);
     try {
       const data = await getProducts(false, {
+        type: "drink",
         page: page,
         limit: limit,
       });
@@ -47,7 +49,7 @@ export default function ProductDetail() {
     <>
       <div className="flex items-center justify-between px-6 md:px-10 py-4">
         <h1 className="text-[#f5f5f5] text-xl md:text-2xl font-semibold tracking-wide">
-          Quản lý sản phẩm
+          Quản lý sản phẩm đồ uống
         </h1>
         <button
           onClick={() => setShowAddDialog(true)}
@@ -77,7 +79,7 @@ export default function ProductDetail() {
                 </p>
 
                 <p className="text-[#ababab] text-sm">
-                  {item.price} VND / {item.unit}
+                  {formatVND(item.price)} / {item.unit}
                 </p>
 
                 <div className="flex justify-end gap-2 mt-2">
@@ -142,7 +144,7 @@ export default function ProductDetail() {
               Xác nhận xoá
             </div>
             <p className="text-[#ababab] text-sm">
-              Bạn có chắc muốn xoá dịch vụ:{" "}
+              Bạn có chắc muốn xoá sản phẩm:{" "}
               <span className="font-semibold text-[#f5f5f5]">
                 {selectedProduct?.name}
               </span>

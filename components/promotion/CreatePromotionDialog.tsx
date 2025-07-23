@@ -1,11 +1,13 @@
 "use client";
 
 import { Dialog } from "@headlessui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { PromotionInput } from "@/types/promotion";
 import { createPromotion } from "@/services/promotion";
 import { IoClose } from "react-icons/io5";
+import { CustomerRole } from "@/types/customerRole";
+import { getCustomerRoles } from "@/services/customerRole";
 
 interface CreatePromotionDialogProps {
   open: boolean;
@@ -23,8 +25,8 @@ export default function CreatePromotionDialog({
     discount_type: "percentage",
     discount_value: 0,
     min_order_value: 0,
-    priority_level_required: 0,
-    total_washes_required: 0,
+    role_id: 1,
+    recent_orders_required: 0,
     start_date: new Date(),
     end_date: new Date(),
     is_active: true,
@@ -32,6 +34,23 @@ export default function CreatePromotionDialog({
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [customerRoles, setCustomerRoles] = useState<CustomerRole[]>([]);
+
+  useEffect(() => {
+    fetchCustomerRoles();
+  }, [])
+
+  const fetchCustomerRoles = async () => {
+    try {
+      const res = await getCustomerRoles(false, { page: 1, limit: 100 });
+      if (res && res.data) {
+        setCustomerRoles(res.data);
+      }
+    } catch (error) {
+      console.error("Error fetching customer roles:", error);
+      toast.error("Không lấy được danh sách danh hiệu khách hàng");
+    }
+  };
 
   const handleAdd = async () => {
     if (newPromotion.name.trim() === "") {
@@ -45,8 +64,8 @@ export default function CreatePromotionDialog({
         discount_type: newPromotion.discount_type.trim(),
         discount_value: newPromotion.discount_value,
         min_order_value: newPromotion.min_order_value,
-        priority_level_required: newPromotion.priority_level_required,
-        total_washes_required: newPromotion.total_washes_required,
+        role_id: newPromotion.role_id,
+        recent_orders_required: newPromotion.recent_orders_required,
         start_date: new Date(startDate),
         end_date: new Date(endDate),
         is_active: newPromotion.is_active,
@@ -57,8 +76,8 @@ export default function CreatePromotionDialog({
         discount_type: "percentage",
         discount_value: 0,
         min_order_value: 0,
-        priority_level_required: 0,
-        total_washes_required: 0,
+        role_id: 1,
+        recent_orders_required: 0,
         start_date: new Date(),
         end_date: new Date(),
         is_active: true,
@@ -142,28 +161,32 @@ export default function CreatePromotionDialog({
 
           <label className="block mb-1 mt-2 text-sm">Kiểu khách hàng</label>
           <select
-            value={newPromotion.priority_level_required}
+            value={newPromotion.role_id}
             onChange={(e) =>
               setNewPromotion({
                 ...newPromotion,
-                priority_level_required: Number(e.target.value) as 0 | 1,
+                role_id: Number(e.target.value),
               })
             }
             className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
           >
-            <option value="0">Khách hàng bình thường</option>
-            <option value="1">Khách hàng thân thiết</option>
+            {
+              customerRoles.map((role) => (
+                <option key={role.id} value={role.id}>
+                  {role.name}
+                </option>
+              ))
+            }
           </select>
-
           <label className="block mb-1 mt-2 text-sm">Số lần giặt</label>
           <input
             type="number"
             placeholder="Số lần giặt cần thiết"
-            value={newPromotion.total_washes_required}
+            value={newPromotion.recent_orders_required}
             onChange={(e) =>
               setNewPromotion({
                 ...newPromotion,
-                total_washes_required: Number(e.target.value),
+                recent_orders_required: Number(e.target.value),
               })
             }
             className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"

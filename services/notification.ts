@@ -41,6 +41,21 @@ export const markNotificationAsRead = async (
   }
 };
 
+export const deleteReadNotification = async (
+  isServer: boolean,
+) => {
+  if (isServer) {
+    await getServerToken();
+    const response = await serverApi.delete(
+      `/auth/notifications`
+    );
+    return response.data;
+  } else {
+    const response = await api.delete(`/auth/notifications`);
+    return response.data;
+  }
+};
+
 export const deleteNotification = async (
   isServer: boolean,
   notificationId: number

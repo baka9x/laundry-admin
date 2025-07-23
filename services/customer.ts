@@ -11,7 +11,7 @@ export const createCustomer = async (
   isServer: boolean,
   input: CustomerInput
 ): Promise<NewCustomerResponse> => {
- if (isServer) {
+  if (isServer) {
     await getServerToken();
     const response = await serverApi.post("/auth/customers", input);
     return response.data;
@@ -46,6 +46,21 @@ export const updateCustomer = async (
     return response.data;
   } else {
     const response = await api.put(`/auth/customers/${customerId}`, input);
+    return response.data;
+  }
+};
+
+export const updateCustomerWashes = async (
+  isServer: boolean,
+  customerId: number,
+  orderSpent: number
+) => {
+  if (isServer) {
+    await getServerToken();
+    const response = await serverApi.put(`/auth/customers/${customerId}/washes`, { order_spent: orderSpent });
+    return response.data;
+  } else {
+    const response = await api.put(`/auth/customers/${customerId}/washes`, { order_spent: orderSpent });
     return response.data;
   }
 };

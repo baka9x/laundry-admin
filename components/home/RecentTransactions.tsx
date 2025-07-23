@@ -2,7 +2,7 @@ import { formatVND } from "@/lib/formatVND";
 import { WashOrdersResponse } from "@/types/washOrder";
 import Link from "next/link";
 import React from "react";
-import { FaCheckDouble, FaCircle, FaSearch } from "react-icons/fa";
+import { FaCheckDouble, FaCircle } from "react-icons/fa";
 
 type RecentTransactionsProps = {
   data: WashOrdersResponse;
@@ -14,7 +14,7 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ data }) => {
       <div className="bg-[#1a1a1a] w-full rounded-lg">
         <div className="flex items-center justify-between px-6 py-4">
           <h3 className="text-[#f5f5f5] text-lg font-semibold tracking-wide">
-            Các giao dịch gần đây
+            Các đơn giặt gần đây
           </h3>
           <Link
             href="/transactions"
@@ -23,16 +23,6 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ data }) => {
             Xem tất cả
           </Link>
         </div>
-
-        <div className="flex items-center gap-4 bg-[#1f1f1f] rounded-[15px] px-6 py-4 mx-6">
-          <FaSearch className="text-[#f5f5f5]" />
-          <input
-            type="text"
-            placeholder="Tìm kiếm giao dịch gần đây"
-            className="bg-[#1f1f1f] outline-none text-[#f5f5f5]"
-          />
-        </div>
-
         {/* Transaction list */}
         <div className="mt-4 px-6 overflow-y-scroll h-[300px]">
           {data && data.data && data.data.map((item, index) => (

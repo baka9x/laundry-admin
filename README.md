@@ -1,23 +1,27 @@
-
-
 Sửa:
 
-- Bảng customers thêm wash_cycle để đếm số lần giặt đến lần được khuyến mại (ví dụ 7 lần sẽ reset về 0)
+Trang home: Doanh thu thêm số đơn sau giá tiền
 
-- khi wash_cycle == số lần giặt sẽ tự động thêm khuyến mại khi tạo đơn
+Đồ uống phổ biến: Thiết kế card 2 cột hiển thị tên đồ uống, số lượng bán, doanh thu tổng
 
-- Sửa CRUD customer front end
+Tạo thêm trang Đồ thống kê đơn đồ uống /drink-order/info
 
-- drink product
+Viết thêm trang detail
 
-- Giao diện đơn giặt sau khi tính tiền (Hoàn tất)
-Viết tiếp: 
+wash-products/[id]/page.tsx Hiển thị thông tin 
 
-- POS drink_orders
+- Danh sách customer [số điện thoại, tên]
+- Số đơn được tạo
+- Doanh thu
 
-- Remove all notification button
+customers/[id]/page.tsx
 
-- Trang customers/[id] hiển thị danh sách các lần giặt của customer
+- Danh sách đơn hàng (Có nút hiển thị dialog invoice)
 
 
+/drink-products/[id]/page.tsx
 
+- Danh sách đơn được tạo
+- Doanh thu
+
+-- Click "Xem chi tiết" trong /wash-order hiện Dialog Invoice

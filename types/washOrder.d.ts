@@ -53,7 +53,7 @@ export interface WashOrderDetailResponse {
     phone: string;
     address: string;
     priority_level: number;
-    total_washes: number;
+    total_orders: number;
   };
   user: {
     id: number;

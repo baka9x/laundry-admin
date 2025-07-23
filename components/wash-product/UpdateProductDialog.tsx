@@ -1,7 +1,7 @@
 "use client";
 import { Dialog } from "@headlessui/react";
 import { useEffect, useState } from "react";
-import { getServices, updateService } from "@/services/service";
+import { getServices } from "@/services/service";
 import toast from "react-hot-toast";
 import { Product, ProductInput } from "@/types/product";
 import { updateProduct } from "@/services/product";

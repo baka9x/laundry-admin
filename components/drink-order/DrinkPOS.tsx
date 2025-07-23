@@ -1,15 +1,11 @@
 "use client";
 import React, { useState, useMemo, useEffect } from "react";
 import { Product } from "@/types/product";
-import { WashOrderDetailResponse } from "@/types/washOrder";
 import { useRouter } from "next/navigation";
-import { createWashOrderItem } from "@/services/washOrderItem";
 import toast from "react-hot-toast";
-import { updateWashOrderStatus, updateWashOrderTotalPrice } from "@/services/washOrder";
 import {
   IoAdd,
   IoCheckmarkCircle,
-  IoPerson,
   IoPricetag,
   IoTrash,
 } from "react-icons/io5";
@@ -20,25 +16,34 @@ import { getServices } from "@/services/service";
 import { getProducts } from "@/services/product";
 import { formatVND } from "@/lib/formatVND";
 import InvoiceModal from "./InvoiceModal";
-import { createNotification } from "@/services/notification";
+import { createDrinkOrderItem } from "@/services/drinkOrderItem";
+import { createDrinkOrder, getDrinkOrderByID } from "@/services/drinkOrder";
+import { DrinkOrderDetailResponse } from "@/types/drinkOrder";
 
 interface Props {
-  order: WashOrderDetailResponse;
   products: Product[];
 }
 
-export default function WashPOS({ order, products }: Props) {
+export default function DrinkPOS({ products }: Props) {
   const router = useRouter();
   const [services, setServices] = useState<ServicesResponse | null>(null);
   const [localItems, setLocalItems] = useState<any[]>([]); // any[] => bạn có thể định nghĩa rõ hơn
   const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
   const [productList, setProductList] = useState<Product[]>(products);
   const [showInvoice, setShowInvoice] = useState(false);
-  const isDeliveried = order.status === "deliveried";
+
+  const [order, setOrder] = useState<DrinkOrderDetailResponse | null>(null);
+
+  const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
+  const [selectedPromotion, setSelectedPromotion] = useState<number | null>(null);
+
+  // const [showCustomerDialog, setShowCustomerDialog] = useState(false);
+  // const [showPromotionDialog, setShowPromotionDialog] = useState(false);
 
   const fetchProductsByService = async (serviceId: number | null) => {
     try {
       const res = await getProducts(false, {
+        type: "drink",
         service_id: serviceId ?? undefined,
         limit: 100,
       });
@@ -51,7 +56,7 @@ export default function WashPOS({ order, products }: Props) {
 
   const fetchServices = async () => {
     try {
-      const res = await getServices(false, { limit: 20 });
+      const res = await getServices(false, { type: "drink", limit: 20 });
       if (!res) {
         return;
       }
@@ -60,6 +65,21 @@ export default function WashPOS({ order, products }: Props) {
       console.error("Error fetching service:", error);
     }
   }
+
+  const fetchCurrentOrder = async (id: number) => {
+    try {
+      const res = await getDrinkOrderByID(false, id); // Thay bằng ID thực tế
+      console.log(res)
+      if (res) {
+        setOrder(res);
+        setSelectedCustomer(res.customer ? res.customer.id : null);
+        setSelectedPromotion(res.promotion ? res.promotion.id : null);
+      }
+    } catch (error) {
+      console.error("Error fetching current order:", error);
+      toast.error("Không lấy được đơn hàng hiện tại");
+    }
+  };
 
 
   useEffect(() => {
@@ -74,12 +94,12 @@ export default function WashPOS({ order, products }: Props) {
 
   const discount = useMemo(
     () =>
-      order.promotion
+      order && order.promotion
         ? order.promotion.discount_type === "percentage"
           ? subtotal * (order.promotion.discount_value / 100)
           : order.promotion.discount_value
         : 0,
-    [subtotal, order.promotion]
+    [subtotal, order?.promotion]
   );
 
   const total = subtotal - discount;
@@ -136,29 +156,45 @@ export default function WashPOS({ order, products }: Props) {
 
   const handleCheckout = async () => {
     try {
-      for (const item of localItems) {
-        await createWashOrderItem({
-          order_id: order.id,
-          product_id: item.product_id,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          subtotal: item.subtotal,
-        });
-      }
 
-      await updateWashOrderTotalPrice(order.id, total);
+      // Create order object
+      const res = await createDrinkOrder({
+        user_id: 1, // Thay bằng user_id thực tế
+        order_date: new Date(),
+        customer_id: selectedCustomer || null,
+        total_amount: total,
+        promotion_id: selectedPromotion || null,
+        status: "deliveried",
+      });
+      if (!res || !res.order_id) {
+        throw new Error("Failed to create order");
+      }
+      fetchCurrentOrder(res.order_id);
+
+      if (res.order_id && typeof res.order_id === "number") {
+        for (const item of localItems) {
+          await createDrinkOrderItem({
+            order_id: res.order_id,
+            product_id: item.product_id,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+            subtotal: item.subtotal,
+          });
+        }
+      } else {
+        throw new Error("Order ID is missing or invalid.");
+      }
       toast.success("Đã thanh toán thành công!");
       setShowInvoice(true); // mở dialog
-      // router.refresh(); // vẫn có thể refresh sau
-      await updateWashOrderStatus(order.id, "deliveried");
-      await createNotification(false, {
-        title: `Đơn hàng #${order.id} - ${order.customer.phone} (${order.customer.name}) đã thanh toán và giao cho khách.`,
-        content: `Đơn hàng #${order.id} - 
-                  SDT: ${order.customer.phone} (${order.customer.name})
-                  pickup_time: ${order.pickup_time} - 
-                  Tổng giá tiền (Tạm tính): ${formatVND(order.total_amount)}`,
-        type: "order",
-      });
+      //router.refresh(); // vẫn có thể refresh sau
+      // await createNotification(false, {
+      //   title: `Đơn hàng #${order.id} - ${order.customer.phone} (${order.customer.name}) đã thanh toán và giao cho khách.`,
+      //   content: `Đơn hàng #${order.id} - 
+      //             SDT: ${order.customer.phone} (${order.customer.name})
+      //             pickup_time: ${order.pickup_time} - 
+      //             Tổng giá tiền (Tạm tính): ${formatVND(order.total_amount)}`,
+      //   type: "order",
+      // });
 
     } catch (e) {
       console.error(e);
@@ -178,18 +214,22 @@ export default function WashPOS({ order, products }: Props) {
                   Đơn hiện tại
                 </h2>
                 <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
-                  #{order.id}
+                  #NAH
                 </span>
               </div>
-              <div className="mt-4 flex space-x-2">
-                <p className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-[#1f1f1f] py-2 px-4 rounded-lg transition">
-                  <IoPerson className="inline mr-2" /> {order.customer.phone} (
-                  {order.customer.name})
-                </p>
-                {/* <p className="flex-1 bg-[#444] hover:bg-[#555] text-[#f5f5f5] py-2 px-4 rounded-lg transition">
-                <IoPricetag className="inline mr-2" /> Giảm giá
-              </p> */}
-              </div>
+              {/* <div className="mt-4 flex space-x-2">
+                <button
+                  onClick={() => setShowCustomerDialog(true)}
+                  className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-[#1f1f1f] py-2 px-4 rounded-lg transition">
+                  <IoPerson className="inline mr-2" /> Chọn khách hàng
+                </button>
+
+                <button
+                  onClick={() => setShowPromotionDialog(true)}
+                  className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition">
+                  <IoPricetag className="inline mr-2" /> Chọn Khuyến mại
+                </button>
+              </div> */}
             </div>
 
             <div className="p-4 border-b border-[#444]">
@@ -291,7 +331,7 @@ export default function WashPOS({ order, products }: Props) {
                 </button>
                 <button
                   onClick={handleCheckout}
-                  disabled={isDeliveried}
+                  disabled={localItems.length === 0}
                   className="bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg transition font-medium">
                   <IoCheckmarkCircle className="inline mr-2" /> Thanh toán
                 </button>
@@ -304,7 +344,7 @@ export default function WashPOS({ order, products }: Props) {
             <div className="p-4 border-b border-[#444]">
               <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
                 <h2 className="text-xl font-semibold text-[#f6b100]">
-                  Dịch vụ giặt ủi
+                  Dịch vụ đồ uống
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   <button
@@ -381,9 +421,9 @@ export default function WashPOS({ order, products }: Props) {
           subtotal={subtotal}
           discount={discount}
           total={total}
-          orderId={order.id}
-          customerName={order.customer.name}
-          customerPhone={order.customer.phone}
+          orderId={order && order.id}
+          customerName="Khách mua đồ uống"
+          customerPhone="XXX"
         />
       )}
     </>

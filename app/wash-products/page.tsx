@@ -11,7 +11,8 @@ export default async function ProductPage() {
   //   console.log("User not logged in or error:", error);
   // }
   return (
-    <section className="md:h-[calc(100vh-5rem)] overflow-hidden mb-20">
+    //h-full md:h-[calc(100vh-5rem)]
+    <section className="overflow-hidden mb-20">
       <ProductDetail />
       <BottomNav />
     </section>

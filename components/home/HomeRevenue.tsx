@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { IoMdCafe } from "react-icons/io";
 import { TbWashHand } from "react-icons/tb";
 import MiniCard from "./MiniCard";
-import { countExpensesAndCompare, countProfitAndCompare, countRevenueAndCompareWashOrders } from "@/services/report";
+import { countExpensesAndCompare, countProfitAndCompare, countRevenueAndCompareDrinkOrders, countRevenueAndCompareWashOrders } from "@/services/report";
 import { ImStatsDots } from "react-icons/im";
 import { FaMoneyBillWave } from "react-icons/fa";
 
@@ -15,6 +15,8 @@ export function HomeRevenue() {
         icon: <TbWashHand size={30} />,
         bgIcon: "bg-blue-600",
         number: 0,
+        orderNum: 0,
+        orderUnit: "Đơn",
         footerNum: 0,
         compareText: " hôm qua"
     });
@@ -24,6 +26,8 @@ export function HomeRevenue() {
         icon: <IoMdCafe size={30} />,
         bgIcon: "bg-yellow-800",
         number: 0,
+        orderNum: 0,
+        orderUnit: "Đơn",
         footerNum: 0,
         compareText: " hôm qua"
     });
@@ -33,6 +37,8 @@ export function HomeRevenue() {
         icon: <ImStatsDots size={30} />,
         bgIcon: "bg-red-800",
         number: 0,
+        orderNum: 0,
+        orderUnit: "Đơn",
         footerNum: 0,
         compareText: "tháng trước"
     });
@@ -42,6 +48,8 @@ export function HomeRevenue() {
         icon: <FaMoneyBillWave size={30} />,
         bgIcon: "bg-green-600",
         number: 0,
+        orderNum: 0,
+        orderUnit: "Đơn",
         footerNum: 0,
         compareText: "tháng trước"
     });
@@ -54,6 +62,23 @@ export function HomeRevenue() {
             }
             setRevenueWashOrders({
                 ...revenueWashOrders,
+                number: res.data.current_total,
+                footerNum: res.data.percentage_change
+            })
+
+        } catch (error) {
+            console.log("Error fetching revenue wash orders: ", error);
+        }
+    }
+
+    const fetchRevenueDrinkOrders = async () => {
+        try {
+            const res = await countRevenueAndCompareDrinkOrders(false, {})
+            if (!res) {
+                return;
+            }
+            setRevenueDrinkOrders({
+                ...revenueDrinkOrders,
                 number: res.data.current_total,
                 footerNum: res.data.percentage_change
             })
@@ -97,6 +122,7 @@ export function HomeRevenue() {
 
     useEffect(() => {
         fetchRevenueWashOrders();
+        fetchRevenueDrinkOrders();
         fetchExpenses();
         fetchProfit();
     }, [])

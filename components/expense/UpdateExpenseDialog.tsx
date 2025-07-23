@@ -1,9 +1,7 @@
 "use client";
 import { Dialog } from "@headlessui/react";
 import { useEffect, useState } from "react";
-import { updateService } from "@/services/service";
 import toast from "react-hot-toast";
-import { Service, ServiceInput } from "@/types/service";
 import { Expense, ExpenseInput } from "@/types/expense";
 import { updateExpense } from "@/services/expense";
 import { IoClose } from "react-icons/io5";

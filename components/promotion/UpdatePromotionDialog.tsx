@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import { Promotion, PromotionInput } from "@/types/promotion";
 import { updatePromotion } from "@/services/promotion";
 import { IoClose } from "react-icons/io5";
+import { CustomerRole } from "@/types/customerRole";
+import { getCustomerRoles } from "@/services/customerRole";
 
 interface UpdatePromotionDialogProps {
   open: boolean;
@@ -25,8 +27,8 @@ export default function UpdatePromotionDialog({
     discount_type: "percentage",
     discount_value: 0,
     min_order_value: 0,
-    priority_level_required: 0,
-    total_washes_required: 0,
+    role_id: 1,
+    recent_orders_required: 0,
     start_date: new Date(),
     end_date: new Date(),
     is_active: true,
@@ -34,16 +36,30 @@ export default function UpdatePromotionDialog({
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [customerRoles, setCustomerRoles] = useState<CustomerRole[]>([]);
+  
+  const fetchCustomerRoles = async () => {
+    try {
+      const res = await getCustomerRoles(false, { page: 1, limit: 100 });
+      if (res && res.data) {
+        setCustomerRoles(res.data);
+      }
+    } catch (error) {
+      console.error("Error fetching customer roles:", error);
+      toast.error("Không lấy được danh sách danh hiệu khách hàng");
+    }
+  };
 
   useEffect(() => {
     if (promotion) {
+      fetchCustomerRoles();
       setPromotionInput({
         name: promotion.name,
         discount_type: promotion.discount_type,
         discount_value: promotion.discount_value,
         min_order_value: promotion.min_order_value,
-        priority_level_required: promotion.priority_level_required ?? 0,
-        total_washes_required: promotion.total_washes_required ?? 0,
+        role_id: promotion.role_id ?? 1,
+        recent_orders_required: promotion.recent_orders_required ?? 0,
         start_date: new Date(promotion.start_date),
         end_date: new Date(promotion.end_date),
         is_active: promotion.is_active,
@@ -139,28 +155,33 @@ export default function UpdatePromotionDialog({
           />
           <label className="block mb-1 mt-2 text-sm">Kiểu khách hàng</label>
           <select
-            value={promotionInput.priority_level_required}
+            value={promotionInput.role_id}
             onChange={(e) =>
               setPromotionInput({
                 ...promotionInput,
-                priority_level_required: Number(e.target.value) as 0 | 1,
+                role_id: Number(e.target.value),
               })
             }
             className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
           >
-            <option value="0">Khách hàng bình thường</option>
-            <option value="1">Khách hàng thân thiết</option>
+            {
+              customerRoles && customerRoles.map((role) => (
+                <option key={role.id} value={role.id}>
+                  {role.name}
+                </option>
+              ))
+            }
           </select>
 
           <label className="block mb-1 mt-2 text-sm">Số lần giặt</label>
           <input
             type="number"
             placeholder="Số lần giặt cần thiết"
-            value={promotionInput.total_washes_required}
+            value={promotionInput.recent_orders_required}
             onChange={(e) =>
               setPromotionInput({
                 ...promotionInput,
-                total_washes_required: Number(e.target.value),
+                recent_orders_required: Number(e.target.value),
               })
             }
             className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"

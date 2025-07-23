@@ -9,6 +9,7 @@ import { CustomersResponse } from "@/types/customer";
 import { WashOrdersResponse } from "@/types/washOrder";
 import { User } from "@/types/user";
 import { HomeRevenue } from "@/components/home/HomeRevenue";
+import PopularDrinks from "@/components/home/PopularDrinks";
 
 export default async function Home() {
   let user: User = {} as User;
@@ -43,8 +44,14 @@ export default async function Home() {
         <div className="w-full md:w-1/3">
           <div className="bg-[#1f1f1f] p-4 rounded-lg shadow">
             <PopularCustomers data={customersResponse} />
+             <PopularDrinks data={customersResponse} />
           </div>
+
+    
+          
         </div>
+
+        
 
         <BottomNav />
       </section>

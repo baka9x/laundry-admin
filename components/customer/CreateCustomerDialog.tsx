@@ -23,8 +23,6 @@ export default function CreateCustomerDialog({
     name: "",
     address: "",
     note: "",
-    priority_level: 0,
-    total_washes: 0
   });
   const [loading, setLoading] = useState(false);
 
@@ -46,8 +44,6 @@ export default function CreateCustomerDialog({
         name: "",
         address: "",
         note: "",
-        priority_level: 0,
-        total_washes: 0
       });
       onAdd();
       onClose();
@@ -109,34 +105,7 @@ export default function CreateCustomerDialog({
             }
             className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
           />
-          <label className="block mb-1 mt-2 text-sm">Số lần giặt</label>
-          <input
-            type="number"
-            value={newCustomerInput.total_washes || 0}
-            onChange={(e) =>
-              setNewCustomerInput({
-                ...newCustomerInput,
-                total_washes: Number(e.target.value),
-              })
-            }
-            className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
-          />
-
-          <label className="block mb-1 mt-2 text-sm">Kiểu khách hàng</label>
-          <select
-            value={newCustomerInput.priority_level}
-            onChange={(e) =>
-              setNewCustomerInput({
-                ...newCustomerInput,
-                priority_level: Number(e.target.value) as 0 | 1,
-              })
-            }
-            className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
-          >
-            <option value="0">Khách hàng bình thường</option>
-            <option value="1">Khách hàng thân thiết</option>
-          </select>
-
+        
           <div className="flex gap-2 mt-4">
             <button
               onClick={handleAdd}

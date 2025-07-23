@@ -9,11 +9,12 @@ const features = [
   { title: "Khuyến mại", description: "Quản lý chương trình khuyến mại", href: "/promotions" },
   { title: "Chi phí", description: "Theo dõi và quản lý chi phí", href: "/expenses" },
   { title: "Khách hàng", description: "Quản lý thông tin khách hàng", href: "/customers" },
+  { title: "Danh hiệu khách hàng", description: "Quản lý các danh hiệu, cấp bậc khách hàng", href: "/customer-roles" },
 ];
 
 export default function MorePage() {
   return (
-    <section className="md:h-[calc(100vh-5rem)] overflow-hidden">
+    <section className="md:h-[calc(100vh-5rem)] overflow-hidden mb-20 md:mb-0">
       <div className="flex items-center justify-between px-6 md:px-10 py-4">
         <h1 className="text-[#f5f5f5] text-xl md:text-2xl font-semibold tracking-wide">
           Quản lý thêm

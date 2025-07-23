@@ -5,28 +5,27 @@ import { BiTrash } from "react-icons/bi";
 import { FaEdit } from "react-icons/fa";
 import { Dialog } from "@headlessui/react";
 import { IoAddCircle } from "react-icons/io5";
-import CreateCustomerDialog from "./CreateCustomerDialog";
-import UpdateCustomerDialog from "./UpdateCustomerDialog";
-import { Customer, CustomersResponse } from "@/types/customer";
-import { deleteCustomer, getCustomers } from "@/services/customer";
-import { formatVND } from "@/lib/formatVND";
+import { CustomerRole, CustomerRolesResponse } from "@/types/customerRole";
+import { deleteCustomerRole, getCustomerRoles } from "@/services/customerRole";
+import CreateCustomerRoleDialog from "./CreateCustomerRoleDialog";
+import UpdateCustomerRoleDialog from "./UpdateCustomerRoleDialog";
 
-export default function CustomerDetail() {
-  const [items, setItems] = useState<CustomersResponse | null>(null);
+export default function CustomerRoleDetail() {
+  const [items, setItems] = useState<CustomerRolesResponse | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+  const [selectedCustomerRole, setSelectedCustomerRole] = useState<CustomerRole | null>(
     null
   );
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const limit = 12;
 
-  const fetchCustomer = async () => {
+  const fetchCustomerRole = async () => {
     setLoading(true);
     try {
-      const data = await getCustomers(false, {
+      const data = await getCustomerRoles(false, {
         page: page,
         limit: limit,
       });
@@ -42,14 +41,14 @@ export default function CustomerDetail() {
     }
   };
   useEffect(() => {
-    fetchCustomer();
+    fetchCustomerRole();
   }, [page]);
 
   return (
     <>
       <div className="flex items-center justify-between px-6 md:px-10 py-4">
         <h1 className="text-[#f5f5f5] text-xl md:text-2xl font-semibold tracking-wide">
-          Quản lý khách hàng
+          Quản lý danh hiệu khách hàng
         </h1>
         <button
           onClick={() => setShowAddDialog(true)}
@@ -70,28 +69,25 @@ export default function CustomerDetail() {
                 transition-all duration-300 ease-in-out cursor-pointer"
               >
                 <h2 className="text-[#f5f5f5] text-lg font-semibold mb-2">
-                  {item.phone} ({item.name})
+                  {item.name}
                 </h2>
                 <div className="grid grid-cols-2 gap-y-2 text-sm max-w-md">
-                  <div className="text-[#ababab] font-medium">Địa chỉ:</div>
-                  <div className="text-[#f5f5f5]">{item.address}</div>
-                  <div className="text-[#ababab] font-medium">Ngày tạo:</div>
-                  <div className="text-[#f5f5f5]">{new Date(item.created_at).toLocaleString()}</div>
-                  <div className="text-[#ababab] font-medium">Tổng lần giặt:</div>
-                  <div className="text-[#f5f5f5] font-bold">{item.total_orders || 0}</div>
-                  <div className="text-[#ababab] font-medium">Số lần giặt gần nhất:</div>
-                  <div className="text-[#f5f5f5] font-bold">{item.recent_orders || 0}</div>
-                  <div className="text-[#ababab] font-medium">Tổng chi tiêu:</div>
-                  <div className="text-[#f5f5f5] font-bold">{formatVND(item.total_spent)}</div>
-                  <div className="text-[#ababab] font-medium">Danh hiệu:</div>
-                  <div className="text-green-500 font-bold">{item.customer_role.name}</div>
-                  <div className="text-[#ababab] font-medium">Ghi chú:</div>
-                  <div className="text-[#f5f5f5]">{item.note}</div>
+                  <div className="text-[#ababab] font-medium">Mô tả:</div>
+                  <div className="text-[#8ecae6]">{item.description}</div>
+
+                  <div className="text-[#ababab] font-medium">Số lần giặt tối thiểu:</div>
+                  <div className="text-[#f5f5f5] font-bold">
+                    {item.min_required || 0}
+                  </div>
+                  <div className="text-[#ababab] font-medium">Số lần giặt tối đa:</div>
+                  <div className="text-[#f5f5f5] font-bold">
+                    {item.max_required || 0}
+                  </div>
                 </div>
                 <div className="flex justify-end gap-2 mt-2">
                   <button
                     onClick={() => {
-                      setSelectedCustomer(item);
+                      setSelectedCustomerRole(item);
                       setShowUpdateDialog(true);
                     }}
                     className="text-yellow-500 hover:text-yellow-400"
@@ -101,7 +97,7 @@ export default function CustomerDetail() {
                   </button>
                   <button
                     onClick={() => {
-                      setSelectedCustomer(item);
+                      setSelectedCustomerRole(item);
                       setShowDeleteDialog(true);
                     }}
                     className="text-red-500 hover:text-red-400"
@@ -115,21 +111,21 @@ export default function CustomerDetail() {
         </div>
       </div>
 
-      <CreateCustomerDialog
+      <CreateCustomerRoleDialog
         open={showAddDialog}
         onClose={() => setShowAddDialog(false)}
         onAdd={() => {
-          fetchCustomer(); // reload lại list sau khi thêm
+          fetchCustomerRole(); // reload lại list sau khi thêm
           setShowAddDialog(false); // đóng dialog
         }}
       />
-      {selectedCustomer && (
-        <UpdateCustomerDialog
+      {selectedCustomerRole && (
+        <UpdateCustomerRoleDialog
           open={showUpdateDialog}
           onClose={() => setShowUpdateDialog(false)}
-          customer={selectedCustomer}
+          customerRole={selectedCustomerRole}
           onUpdate={() => {
-            fetchCustomer();
+            fetchCustomerRole();
             setShowUpdateDialog(false);
           }}
         />
@@ -150,9 +146,9 @@ export default function CustomerDetail() {
               Xác nhận xoá
             </div>
             <p className="text-[#ababab] text-sm">
-              Bạn có chắc muốn xoá khách hàng:{" "}
+              Bạn có chắc muốn xoá danh hiệu:{" "}
               <span className="font-semibold text-[#f5f5f5]">
-                {selectedCustomer?.name}
+                {selectedCustomerRole?.name}
               </span>
               ?
             </p>
@@ -165,11 +161,11 @@ export default function CustomerDetail() {
               </button>
               <button
                 onClick={async () => {
-                  if (!selectedCustomer) return;
+                  if (!selectedCustomerRole) return;
                   try {
-                    await deleteCustomer(false, selectedCustomer.id);
+                    await deleteCustomerRole(false, selectedCustomerRole.id);
                     toast.success("Xoá thành công");
-                    fetchCustomer();
+                    fetchCustomerRole();
                     setShowDeleteDialog(false);
                   } catch (err) {
                     console.error(err);
