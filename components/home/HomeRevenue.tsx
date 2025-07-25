@@ -63,6 +63,7 @@ export function HomeRevenue() {
             setRevenueWashOrders({
                 ...revenueWashOrders,
                 number: res.data.current_total,
+                orderNum: res.data.order_num,
                 footerNum: res.data.percentage_change
             })
 
@@ -80,6 +81,7 @@ export function HomeRevenue() {
             setRevenueDrinkOrders({
                 ...revenueDrinkOrders,
                 number: res.data.current_total,
+                orderNum: res.data.order_num,
                 footerNum: res.data.percentage_change
             })
 
@@ -97,6 +99,7 @@ export function HomeRevenue() {
             setThisMonthExpense({
                 ...thisMonthExpense,
                 number: res.data.current_total,
+                orderNum: res.data.order_num,
                 footerNum: res.data.percentage_change
             })
         } catch (error) {
@@ -113,6 +116,7 @@ export function HomeRevenue() {
             setThisMonthProfit({
                 ...thisMonthProfit,
                 number: res.data.current_total,
+                orderNum: res.data.order_num,
                 footerNum: res.data.percentage_change
             })
         } catch (error) {

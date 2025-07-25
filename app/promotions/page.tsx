@@ -1,6 +1,12 @@
 import BottomNav from "@/components/layout/BottomNav";
 import PromotionDetail from "@/components/promotion/PromotionDetail";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: 'Quản Lý Khuyến Mại',
+  description: "Trang quản lý khuyến mại, giảm giá.",
+  robots: "noindex",
+}
 
 export default async function PromotionPage() {
   //let user: User = {} as User;

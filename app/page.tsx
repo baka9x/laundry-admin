@@ -10,11 +10,14 @@ import { WashOrdersResponse } from "@/types/washOrder";
 import { User } from "@/types/user";
 import { HomeRevenue } from "@/components/home/HomeRevenue";
 import PopularDrinks from "@/components/home/PopularDrinks";
+import { TopDrinkOrderItemsResponse } from "@/types/drinkOrderItem";
+import { getTopDrinkOrderItems } from "@/services/drinkOrderItem";
 
 export default async function Home() {
   let user: User = {} as User;
   let ordersResponse: WashOrdersResponse;
   let customersResponse: CustomersResponse;
+  let topDrinkOrdersItemResponse: TopDrinkOrderItemsResponse;
   try {
     user = await getUserProfile(true);
     ordersResponse = await getWashOrders(true, {
@@ -25,6 +28,7 @@ export default async function Home() {
     })
 
     customersResponse = await getCustomers(true);
+    topDrinkOrdersItemResponse = await getTopDrinkOrderItems(true, { date: "this_month", limit: 5 })
     return (
       // h-[calc(100vh-5rem)]
       <section className="flex flex-col md:flex-row gap-4 px-4 py-6 mb-20">
@@ -44,15 +48,9 @@ export default async function Home() {
         <div className="w-full md:w-1/3">
           <div className="bg-[#1f1f1f] p-4 rounded-lg shadow">
             <PopularCustomers data={customersResponse} />
-             <PopularDrinks data={customersResponse} />
+            <PopularDrinks data={topDrinkOrdersItemResponse} />
           </div>
-
-    
-          
         </div>
-
-        
-
         <BottomNav />
       </section>
 

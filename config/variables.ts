@@ -1,6 +1,6 @@
-export const BACKEND_URL = "http://localhost:5000";
-export const FRONTEND_URL = "http://localhost:3000";
-export const CDN_URL = "http://localhost:5000";
+export const BACKEND_URL = "http://192.168.0.111:5000";
+export const FRONTEND_URL = "http://192.168.0.111:3000";
+export const CDN_URL = "http://192.168.0.111:5000";
 
 export const dateOptions = [
   { value: "", label: "Tất cả" },

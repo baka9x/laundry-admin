@@ -43,7 +43,7 @@ export default function BottomNav() {
             )}
           >
             <span>{item.icon}</span>
-            <span className="hidden sm:inline mt-1">{item.label}</span>
+            <span className="mt-1">{item.label}</span>
           </button>
         ))}
       </div>

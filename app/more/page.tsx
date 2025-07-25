@@ -1,6 +1,12 @@
-'use client';
 import BottomNav from "@/components/layout/BottomNav";
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: 'Quản Lý Thêm',
+  description: "Trang quản lý thêm các tính năng khác.",
+  robots: "noindex",
+}
 
 const features = [
   { title: "Dịch vụ", description: "Quản lý dịch vụ giặt ủi và đồ uống", href: "/services" },

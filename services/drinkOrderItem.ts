@@ -1,4 +1,4 @@
-import { DrinkOrderItem, DrinkOrderItemInput } from "@/types/drinkOrderItem";
+import { DrinkOrderItem, DrinkOrderItemInput, TopDrinkOrderItemsResponse } from "@/types/drinkOrderItem";
 import { api } from "./api";
 import { getServerToken, serverApi } from "./serverApi";
 
@@ -38,3 +38,17 @@ export const getDrinkOrderItemsByOrderID = async (
     return response.data;
   }
 };
+
+export const getTopDrinkOrderItems = async (
+  isServer: boolean,
+  params: { date?: string, startDate?: string, endDate?: string, page?: number, limit?: number }
+): Promise<TopDrinkOrderItemsResponse> => {
+  if (isServer) {
+    await getServerToken();
+    const response = await serverApi.get("/auth/drink-order-items/top-orders", { params });
+    return response.data;
+  } else {
+    const response = await api.get("/auth/drink-order-items/top-orders", { params });
+    return response.data;
+  }
+}

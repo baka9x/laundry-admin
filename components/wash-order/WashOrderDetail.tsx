@@ -170,7 +170,7 @@ export default function WashOrderDetail() {
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="bg-[#f6b100] text-[#1e1e1e] text-sm font-bold px-3 py-1 rounded-full shadow">
-                    Đơn hàng #{item.id}
+                    Đơn giặt #{item.id}
                   </span>
                   <div className="relative">
                     <StatusBadge

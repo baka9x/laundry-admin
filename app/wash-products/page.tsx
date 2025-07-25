@@ -1,7 +1,14 @@
 import BottomNav from "@/components/layout/BottomNav";
 import ProductDetail from "@/components/wash-product/ProductDetail";
+import { Metadata } from "next";
 //import { getUserProfile } from "@/services/user";
 //import { User } from "@/types/user";
+
+export const metadata: Metadata = {
+  title: 'Quản Lý Sản Phẩm Giặt Ủi',
+  description: "Trang thông tin các sản phẩm dịch vụ giặt ủi sấy.",
+  robots: "noindex",
+}
 
 export default async function ProductPage() {
   //let user: User = {} as User;

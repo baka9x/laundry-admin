@@ -25,3 +25,16 @@ export interface DrinkOrderItemInput {
   unit_price: number;
   subtotal: number;
 }
+
+export interface TopDrinkOrderItemsResponse {
+  data: {
+    product_id: number;
+    product_name: string;
+    total_qty: number,
+    total_amount: number
+  }[],
+  limit: number,
+  page: number,
+  total: number,
+  total_pages: number
+}

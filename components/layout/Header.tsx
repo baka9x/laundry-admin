@@ -19,6 +19,7 @@ import NotificationBadge from "../ui/NotificationBadge";
 import { WashOrdersResponse } from "@/types/washOrder";
 import { getWashOrders } from "@/services/washOrder";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 interface HeaderProps {
   data: User;
@@ -106,18 +107,18 @@ const Header: React.FC<HeaderProps> = ({ data }) => {
           className="h-8 w-8"
           alt="Laundry Logo"
         />
-        <h1 className="text-xl font-semibold text-[#f5f5f5]">AdminPanel</h1>
+        <Link href="/" title="Trang chủ"><h1 className="text-xl font-semibold text-[#f5f5f5]">Giặt Sấy Thiên Nhi</h1></Link>
       </div>
 
       {/* SEARCH */}
-      <div className="hidden md:flex items-center gap-4 bg-[#1f1f1f] rounded-[15px] px-5 py-2 w-full md:w-[400px] lg:w-[500px]">
+      {/* <div className="hidden md:flex items-center gap-4 bg-[#1f1f1f] rounded-[15px] px-5 py-2 w-full md:w-[400px] lg:w-[500px]">
         <FaSearch className="text-[#f5f5f5]" />
         <input
           type="text"
           placeholder="Tìm kiếm"
           className="bg-[#1f1f1f] outline-none text-[#f5f5f5] w-full"
         />
-      </div>
+      </div> */}
 
       {/* NOTIFICATION + USER */}
       <div className="flex items-center gap-4 ml-auto relative">

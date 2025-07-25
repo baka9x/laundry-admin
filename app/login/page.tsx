@@ -1,4 +1,11 @@
 import LoginForm from "@/components/user/Login";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'Đăng Nhập',
+  description: "Đăng nhập vào Trang quản lý",
+  robots: "noindex"
+}
 
 export default function LoginPage() {
   return (
