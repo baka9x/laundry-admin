@@ -6,6 +6,7 @@ import { formatVND } from "@/lib/formatVND";
 interface InvoiceItem {
   id: number;
   product?: { name: string };
+  product_name?: string;
   quantity: number;
   subtotal: number;
 }
@@ -20,6 +21,7 @@ interface InvoiceModalProps {
   orderId: number;
   customerName: string;
   customerPhone: string;
+  orderDate?: string;
 }
 
 export default function InvoiceModal({
@@ -32,6 +34,7 @@ export default function InvoiceModal({
   orderId,
   customerName,
   customerPhone,
+  orderDate,
 }: InvoiceModalProps) {
   if (!show) return null;
 
@@ -45,11 +48,11 @@ export default function InvoiceModal({
         <div className="space-y-1 text-sm">
           <p>Đơn hàng: #{orderId}</p>
           <p>Khách hàng: {customerName} ({customerPhone})</p>
-          <p>Ngày: {new Date().toLocaleString()}</p>
+          <p>Ngày: {orderDate ? new Date(orderDate).toLocaleString() : new Date().toLocaleString()}</p>
           <hr className="my-2 border-[#444]" />
-          {items.map((item) => (
-            <div key={item.id} className="flex justify-between">
-              <span>{item.product?.name} x{item.quantity}</span>
+          {items.map((item, index) => (
+            <div key={`${index}-XXX`} className="flex justify-between">
+              <span>{item?.product_name ?? item.product?.name} x{item.quantity}</span>
               <span>{formatVND(item.subtotal)}</span>
             </div>
           ))}

@@ -66,7 +66,7 @@ const Header: React.FC<HeaderProps> = ({ data }) => {
     } catch (error) {
       console.error("Error delete notification:", error);
     }
-  }
+  };
 
   const handleDeleteNotification = async (id: number) => {
     try {
@@ -77,9 +77,17 @@ const Header: React.FC<HeaderProps> = ({ data }) => {
     }
   };
 
-  const handleReadNotification = async (id: number) => {
+  const handleReadNotification = async (id?: number) => {
     try {
-      await markNotificationAsRead(false, id, { is_read: true });
+      if (id) {
+        await markNotificationAsRead(false, {
+          notification_id: id,
+          is_read: true,
+        });
+      } else {
+        await markNotificationAsRead(false, { is_read: false });
+      }
+
       fetchAll();
     } catch (error) {
       console.error("Error read notification:", error);
@@ -107,7 +115,11 @@ const Header: React.FC<HeaderProps> = ({ data }) => {
           className="h-8 w-8"
           alt="Laundry Logo"
         />
-        <Link href="/" title="Trang chủ"><h1 className="text-xl font-semibold text-[#f5f5f5]">Giặt Sấy Thiên Nhi</h1></Link>
+        <Link href="/" title="Trang chủ">
+          <h1 className="text-xl font-semibold text-[#f5f5f5]">
+            Giặt Sấy Thiên Nhi
+          </h1>
+        </Link>
       </div>
 
       {/* SEARCH */}
@@ -140,12 +152,25 @@ const Header: React.FC<HeaderProps> = ({ data }) => {
                   <FaBell /> Hôm nay: {washOrders ? washOrders.total : 0} đơn
                   giặt mới
                 </li>
-                <button 
-                onClick={() => {
-                  handleDeleteReadNotification();
-                }}
-                
-                className="bg-[#222] font-bold text-red-500 w-full px-1 py-2 cursor-pointer hover:bg-[#333]">Xoá tất cả thông báo</button>
+                <div className="flex justify-center items-center">
+                  <button
+                    onClick={() => {
+                      handleDeleteReadNotification();
+                    }}
+                    className="flex-1 bg-[#222] font-bold text-red-500 w-full px-1 py-2 cursor-pointer hover:bg-[#333]"
+                  >
+                    Xoá tất cả
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleReadNotification();
+                    }}
+                    className="flex-1 bg-[#222] font-bold text-red-500 w-full px-1 py-2 cursor-pointer hover:bg-[#333]"
+                  >
+                    Đọc tất cả
+                  </button>
+                </div>
+
                 {notifications?.data?.length ? (
                   notifications.data.map((notification) => (
                     <li
@@ -155,10 +180,11 @@ const Header: React.FC<HeaderProps> = ({ data }) => {
                         }
                       }}
                       key={notification.id}
-                      className={`flex justify-between ${!notification.is_read
+                      className={`flex justify-between ${
+                        !notification.is_read
                           ? "bg-[#3f3f3f] cursor-pointer font-bold"
                           : ""
-                        } items-center px-4 py-2 border-b border-[#444]`}
+                      } items-center px-4 py-2 border-b border-[#444]`}
                     >
                       <NotificationBadge type={notification.type} />
                       <span className="ml-2 flex-1 tracking-wide">

@@ -15,12 +15,12 @@ import { getTopDrinkOrderItems } from "@/services/drinkOrderItem";
 
 export default async function Home() {
   let user: User = {} as User;
-  let ordersResponse: WashOrdersResponse;
+  let washOrdersResponse: WashOrdersResponse;
   let customersResponse: CustomersResponse;
   let topDrinkOrdersItemResponse: TopDrinkOrderItemsResponse;
   try {
     user = await getUserProfile(true);
-    ordersResponse = await getWashOrders(true, {
+    washOrdersResponse = await getWashOrders(true, {
       status: "",
       date: "",
       page: 1,
@@ -39,7 +39,7 @@ export default async function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
               <HomeRevenue />
             </div>
-            <RecentTransactions data={ordersResponse} />
+            <RecentTransactions data={washOrdersResponse} />
 
           </div>
         </div>

@@ -17,7 +17,7 @@ export default async function DrinkOrderPage() {
   ]);
 
   return (
-    <section className="h-[calc(100vh-5rem)] overflow-auto px-4 py-6 mb-10 md:mb-0">
+    <section className="md:h-[calc(100vh-5rem)] overflow-auto px-4 py-6">
       <DrinkPOS products={products.data} />
       <BottomNav />
     </section>

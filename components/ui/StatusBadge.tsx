@@ -12,7 +12,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className={`text-xs font-semibold px-2 py-0.5 rounded flex items-center gap-1
+      className={`text-sm font-semibold px-2 py-0.5 rounded flex items-center gap-1
         ${
           option?.value === 'completed'
             ? 'bg-green-600 text-white'

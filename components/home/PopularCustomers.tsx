@@ -19,7 +19,7 @@ const PopularCustomers: React.FC<PopularCustomersProps> = ({ data }) => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 max-h-[350px] overflow-y-auto scrollbar-thin scrollbar-thumb-[#333]">
+        <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4 p-6 max-h-[350px] overflow-y-auto scrollbar-thin scrollbar-thumb-[#333]">
           {data?.data?.map((item, index) => (
             <div key={index} className="bg-[#2a2a2a] rounded-xl p-4 flex gap-4 items-start hover:bg-[#333] transition duration-300 ease-in-out">
               <div className="flex flex-col items-center justify-center">

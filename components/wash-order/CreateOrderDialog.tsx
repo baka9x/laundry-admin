@@ -351,9 +351,10 @@ export default function CreateOrderDialog({
           <label className="block mb-1 text-sm">Tổng tiền</label>
           <input
             type="number"
-            value={totalAmount}
+            value={totalAmount ?? ""}
             onChange={(e) => setTotalAmount(Number(e.target.value))}
             className="w-full p-2 rounded bg-[#343434] text-white"
+            placeholder="0"
           />
         </div>
 

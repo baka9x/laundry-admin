@@ -22,19 +22,18 @@ export const createNotification = async (
 
 export const markNotificationAsRead = async (
   isServer: boolean,
-  notificationId: number,
-  input: { is_read: boolean }
+  input: { notification_id?: number, is_read: boolean }
 ) => {
   if (isServer) {
     await getServerToken();
     const response = await serverApi.put(
-      `/auth/notifications/${notificationId}/read`,
+      `/auth/notifications/read`,
       input
     );
     return response.data;
   } else {
     const response = await api.put(
-      `/auth/notifications/${notificationId}/read`,
+      `/auth/notifications/read`,
       input
     );
     return response.data;

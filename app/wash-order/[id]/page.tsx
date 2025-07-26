@@ -25,7 +25,7 @@ export default async function WashOrderPage({ params }: WashOrderPageProps) {
   ]);
 
   return (
-    <section className="md:h-[calc(100vh-5rem)] overflow-auto overflow-x-scroll px-4 py-6">
+    <section className="md:h-[calc(100vh-5rem)] overflow-auto px-4 py-6">
       <WashPOS order={order} products={products.data} />
       <BottomNav />
     </section>

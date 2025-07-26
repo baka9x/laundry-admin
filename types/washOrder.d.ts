@@ -1,3 +1,6 @@
+import { Promotion } from "./promotion";
+import { WashOrderItem } from "./washOrderItem";
+
 export interface WashOrder {
   id: number;
   customer_name: string;
@@ -15,7 +18,9 @@ export interface WashOrder {
     | string; // có thể mở rộng enum
   wash_order_items: WashOrderItem[];
   promotion_id: number | null;
-  promotions: any | null; // hoặc bạn định nghĩa rõ kiểu Promotions nếu cần
+  promotions: Promotion[];
+  created_at: string;
+  updated_at: string;
 }
 
 export interface WashOrderInput {
@@ -70,5 +75,5 @@ export interface WashOrderDetailResponse {
   }
   created_at: string;
   updated_at: string;
-  wash_order_items: any;
+  wash_order_items: WashOrderItem[];
 }

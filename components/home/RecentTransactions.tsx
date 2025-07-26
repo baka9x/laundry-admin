@@ -13,7 +13,7 @@ const getStatusInfo = (status: string) => {
   switch (status.toLowerCase()) {
     case "completed":
       return {
-        color: "text-purple-500",
+        color: "text-green-500",
         icon: <BiSolidWasher className="inline mr-1" />,
         label: "Đã giặt xong",
       };
@@ -31,9 +31,9 @@ const getStatusInfo = (status: string) => {
       };
     case "deliveried":
       return {
-        color: "text-green-500",
+        color: "text-purple-500",
         icon: <FaCheckCircle className="inline mr-1" />,
-        label: "Đã thanh toán",
+        label: "Đã giao",
       };
     default:
       return {
@@ -56,7 +56,7 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ data }) => {
         </div>
 
         {/* Grid layout 3 columns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-6 py-4 max-h-[400px] overflow-y-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4 px-6 py-4 max-h-[400px] overflow-y-auto">
           {data?.data?.map((item, index) => {
             const statusInfo = getStatusInfo(item.status);
             return (

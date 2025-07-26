@@ -6,10 +6,10 @@ interface MiniCardProps {
     title: string;
     icon: React.ReactNode;
     bgIcon?: string;
-    number: number;
-    orderNum: number;
+    number: number | 0;
+    orderNum: number | 0;
     orderUnit: string;
-    footerNum: number;
+    footerNum: number | 0;
     compareText: string;
   };
 }

@@ -38,3 +38,17 @@ export const getWashOrderItemsByOrderID = async (
     return response.data;
   }
 };
+
+export const deleteAllWashItemsByOrderID = async (
+  isServer = false,
+  orderId: number
+): Promise<void> => {
+  if (isServer) {
+    await getServerToken();
+    const response = await serverApi.delete(`/auth/wash-order-items/order/${orderId}`);
+    return response.data;
+  } else {
+    const response = await api.delete(`/auth/wash-order-items/order/${orderId}`);
+    return response.data;
+  }
+};

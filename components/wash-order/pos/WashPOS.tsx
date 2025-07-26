@@ -3,9 +3,9 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Product } from "@/types/product";
 import { WashOrderDetailResponse } from "@/types/washOrder";
 import { useRouter } from "next/navigation";
-import { createWashOrderItem } from "@/services/washOrderItem";
+import { createWashOrderItem, deleteAllWashItemsByOrderID } from "@/services/washOrderItem";
 import toast from "react-hot-toast";
-import { updateWashOrderStatus, updateWashOrderTotalPrice } from "@/services/washOrder";
+import { updateWashOrderTotalPrice } from "@/services/washOrder";
 import {
   IoAdd,
   IoCheckmarkCircle,
@@ -112,6 +112,7 @@ export default function WashPOS({ order, products }: Props) {
         },
       ];
     });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const updateQuantity = (productId: number, newQty: number) => {
@@ -138,6 +139,10 @@ export default function WashPOS({ order, products }: Props) {
 
   const handleCheckout = async () => {
     try {
+      if (order.total_amount > 0){
+        // Xoa tat ca item product truoc khi tao lai don
+        await deleteAllWashItemsByOrderID(false, order.id);
+      }
       for (const item of localItems) {
         await createWashOrderItem({
           order_id: order.id,
@@ -148,14 +153,13 @@ export default function WashPOS({ order, products }: Props) {
         });
       }
       await updateWashOrderTotalPrice(order.id, total);
-      await updateWashOrderStatus(order.id, "deliveried");
       await updateCustomerWashes(false, order.customer.id, total);
-      toast.success("Đã thanh toán thành công!");
+      toast.success("Đã tính tiền thành công!");
       setShowInvoice(true); // mở dialog
       // router.refresh(); // vẫn có thể refresh sau
       
       await createNotification(false, {
-        title: `Đơn hàng #${order.id} - ${order.customer.phone} (${order.customer.name}) đã thanh toán và giao cho khách.`,
+        title: `Đơn hàng #${order.id} - ${order.customer.phone} (${order.customer.name}) đã tính tiền.`,
         content: `Đơn hàng #${order.id} - 
                   SDT: ${order.customer.phone} (${order.customer.name})
                   pickup_time: ${order.pickup_time} - 
@@ -171,7 +175,7 @@ export default function WashPOS({ order, products }: Props) {
 
   return (
     <>
-      <div className="bg-[#1f1f1f] rounded-xl shadow-lg overflow-hidden text-[#f5f5f5] mt-2 mb-5">
+      <div className="bg-[#1f1f1f] rounded-xl shadow-lg overflow-hidden text-[#f5f5f5] mt-2 mb-10">
         <div className="flex flex-col md:flex-row">
           {/* Order Section */}
           <div className="w-full md:w-2/5 border-b md:border-b-0 md:border-r border-[#444] bg-[#262626]">
@@ -211,7 +215,7 @@ export default function WashPOS({ order, products }: Props) {
                   {localItems.map((item) => (
                     <div
                       key={item.id}
-                      className="p-4 rounded-lg border border-[#444] bg-[#1f1f1f]"
+                      className="p-4 rounded-lg border border-[#444] bg-[#1f1f1f] mb-2"
                     >
                       <div className="flex justify-between items-center">
                         <div className="flex flex-col items-start gap-0.5">

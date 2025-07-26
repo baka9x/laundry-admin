@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Dropdown from "../ui/DropDown";
 import { WashOrder, WashOrdersResponse } from "@/types/washOrder";
 import { getWashOrders, updateWashOrderStatus } from "@/services/washOrder";
@@ -12,6 +12,9 @@ import CreateOrderDialog from "./CreateOrderDialog";
 import { BsFillFileEarmarkPlusFill } from "react-icons/bs";
 import { createNotification } from "@/services/notification";
 import { formatVND } from "@/lib/formatVND";
+import InvoiceModal from "./InvoiceModal";
+import { WashOrderItem } from "@/types/washOrderItem";
+import DeliveryToCustomerDialog from "./DeliveryToCustomerDialog";
 
 export default function WashOrderDetail() {
   const router = useRouter();
@@ -23,6 +26,12 @@ export default function WashOrderDetail() {
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [items, setItems] = useState<WashOrdersResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showInvoice, setShowInvoice] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<WashOrder | null>(null);
+  const [selectedItems, setSelectedItems] = useState<WashOrderItem[] | null>(
+    null
+  );
+  const [showDeliveryDialog, setShowDeliveryDialog] = useState(false);
   const [page, setPage] = useState(1);
   const limit = 12;
   const toggleDropdown = (id: number) => {
@@ -117,7 +126,7 @@ export default function WashOrderDetail() {
           customerPhone: item.customer_phone,
           pickUpTime: item.pickup_time,
           totalAmount: item.total_amount,
-          status: " đã thanh toán và giao cho khách",
+          status: " đã nhận tiền giao cho khách",
         });
       } else if (newStatus === "processing") {
         handleAddNotification({
@@ -138,13 +147,27 @@ export default function WashOrderDetail() {
     }
   };
 
+  const handleShowInvoiceDetail = (
+    order: WashOrder,
+    items: WashOrderItem[]
+  ) => {
+    setSelectedOrder(order);
+    setSelectedItems(items);
+    setShowInvoice(true);
+  };
+
+  const handleShowDeliveryToCustomer = (order: WashOrder) => {
+    setSelectedOrder(order);
+    setShowDeliveryDialog(true);
+  };
+
   return (
     <>
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 px-4 md:px-6 lg:px-10 py-4">
         <h1 className="text-[#f5f5f5] text-xl md:text-2xl font-semibold tracking-wide">
           Đơn giặt
         </h1>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 h-auto">
           <Dropdown
             label={dateSelected}
             options={dateOptions}
@@ -188,7 +211,7 @@ export default function WashOrderDetail() {
                               onClick={() =>
                                 handleChangeOrderStatus(item, opt.value)
                               }
-                              className="block px-3 py-1 text-left text-xs text-[#f5f5f5] hover:bg-[#3a3a3a] w-full"
+                              className="block px-3 py-1 text-left text-sm text-[#f5f5f5] hover:bg-[#3a3a3a] w-full"
                             >
                               {opt.label}
                             </button>
@@ -201,29 +224,55 @@ export default function WashOrderDetail() {
                   SĐT: {item.customer_phone} ({item.customer_name})
                 </h3>
                 <div className="grid grid-cols-2 gap-y-2 text-sm max-w-md">
-                  <div className="text-[#ababab] font-medium">Ngày đặt hàng:</div>
-                  <div className="text-[#f5f5f5]">{new Date(item.order_date).toLocaleString()}</div>
+                  <div className="text-[#ababab] font-medium">
+                    Ngày đặt hàng:
+                  </div>
+                  <div className="text-[#f5f5f5]">
+                    {new Date(item.order_date).toLocaleString()}
+                  </div>
                   <div className="text-[#ababab] font-medium">Ngày giao:</div>
-                  <div className="text-[#f5f5f5]">{item.pickup_time
-                    ? new Date(item.pickup_time).toLocaleString()
-                    : "N/A"}</div>
-                  <div className="text-[#ababab] font-medium">Tổng giá tiền:</div>
-                  <div className="text-red-300 font-bold">{formatVND(item.total_amount)}</div>
+                  <div className="text-[#f5f5f5]">
+                    {item.pickup_time
+                      ? new Date(item.pickup_time).toLocaleString()
+                      : "N/A"}
+                  </div>
+                  <div className="text-[#ababab] font-medium">
+                    Tổng giá tiền:
+                  </div>
+                  <div className="text-red-300 font-bold">
+                    {formatVND(item.total_amount)}
+                  </div>
                   {/* <div className="text-[#f5f5f5]">{item.note}</div> */}
                 </div>
 
                 <div className="mt-4 flex justify-end gap-2">
-                  {item.status !== "deliveried" &&
-                    item.status === "completed" && (
+                  {item.status === "completed" && (
+                    <>
+                      {item.total_amount > 0 && (
+                        <button
+                          onClick={() => handleShowDeliveryToCustomer(item)}
+                          className="bg-purple-500 hover:bg-purple-600 text-[#1e1e1e] text-sm font-bold px-3 py-1 rounded-full shadow cursor-pointer"
+                        >
+                          Giao cho khách
+                        </button>
+                      )}
+
                       <button
                         onClick={() => router.push(`/wash-order/${item.id}`)}
-                        className="text-[#f6b100] text-xs hover:underline cursor-pointer"
+                        className="bg-red-500 hover:bg-red-600 text-[#1e1e1e] text-sm font-bold px-3 py-1 rounded-full shadow cursor-pointer"
                       >
-                        Tính tiền
+                        {item.total_amount > 0 ? "Tính lại tiền" : "Tính tiền"}
                       </button>
-                    )}
+                    </>
+                  )}
+
                   {item.status === "deliveried" && (
-                    <button className="text-[#f6b100] text-xs hover:underline cursor-pointer">
+                    <button
+                      onClick={() =>
+                        handleShowInvoiceDetail(item, item.wash_order_items)
+                      }
+                      className="bg-green-600 hover:bg-green-400 text-[#1e1e1e] text-sm font-bold px-3 py-1 rounded-full shadow cursor-pointer"
+                    >
                       Xem chi tiết
                     </button>
                   )}
@@ -276,6 +325,46 @@ export default function WashOrderDetail() {
           setShowAddDialog(false); // đóng dialog
         }}
       />
+      {selectedOrder && (
+        <DeliveryToCustomerDialog
+          isOpen={showDeliveryDialog}
+          onClose={() => setShowDeliveryDialog(false)}
+          washOrder={selectedOrder}
+          onDelivery={() => {
+            fetchOrders();
+            setShowDeliveryDialog(false);
+          }}
+        />
+      )}
+
+      {showInvoice && selectedOrder && selectedItems && (
+        <InvoiceModal
+          show={showInvoice}
+          onClose={() => {
+            setShowInvoice(false);
+            setSelectedOrder(null);
+            setSelectedItems(null);
+          }}
+          items={selectedItems}
+          subtotal={selectedItems.reduce(
+            (acc, cur) => acc + cur.unit_price * cur.quantity,
+            0
+          )}
+          discount={
+            selectedOrder.promotion_id
+              ? selectedItems.reduce(
+                  (acc, cur) => acc + cur.unit_price * cur.quantity,
+                  0
+                ) - selectedOrder.total_amount
+              : 0
+          }
+          total={selectedOrder.total_amount}
+          orderId={selectedOrder.id}
+          customerName={selectedOrder.customer_name}
+          customerPhone={selectedOrder.customer_phone}
+          orderDate={selectedOrder.order_date}
+        />
+      )}
     </>
   );
 }
