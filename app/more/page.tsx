@@ -13,9 +13,14 @@ const features = [
   { title: "Sản phẩm giặt", description: "Quản lý sản phẩm giặt sấy", href: "/wash-products" },
   { title: "Sản phẩm đồ uống", description: "Quản lý sản phẩm đồ uống, coffee, nước ngọt", href: "/drink-products" },
   { title: "Khuyến mại", description: "Quản lý chương trình khuyến mại", href: "/promotions" },
-  { title: "Chi phí", description: "Theo dõi và quản lý chi phí", href: "/expenses" },
+  { title: "Chi phí cố định hàng tháng", description: "Theo dõi và quản lý chi phí", href: "/expenses" },
   { title: "Khách hàng", description: "Quản lý thông tin khách hàng", href: "/customers" },
   { title: "Danh hiệu khách hàng", description: "Quản lý các danh hiệu, cấp bậc khách hàng", href: "/customer-roles" },
+  { title: "Thêm nguyên liệu", description: "Quản lý material", href: "/materials" },
+  { title: "Nhập lô nguyên liệu", description: "Quản lý các đợt nhập lô nguyên liệu", href: "/materials/batches" },
+  { title: "Thêm cà phê trộn", description: "Quản lý, định nghĩa cà phê trộn", href: "/coffee-blends" },
+  { title: "Công thức pha cà phê trộn", description: "Quản lý công thức pha cà phê trộn", href: "/coffee-blends/batches" },
+  { title: "Tổng tồn kho", description: "Quản lý, định nghĩa cà phê trộn", href: "/inventories" },
 ];
 
 export default function MorePage() {

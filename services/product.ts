@@ -52,3 +52,16 @@ export const deleteProduct = async (isServer: boolean, productId: number) => {
     return response.data;
   }
 };
+
+
+export const sellProduct = async (isServer: false, input: ProductInput[]) => {
+  if (isServer) {
+    await getServerToken();
+    const response = await serverApi.post("/auth/products/sell", input);
+    return response.data;
+  } else {
+    const response = await api.post("/auth/products/sell", input);
+    return response.data;
+  }
+};
+

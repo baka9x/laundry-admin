@@ -18,6 +18,11 @@ export interface ProductInput {
   unit: string;
 }
 
+export interface SellProductInput {
+  product_id: number;
+  quantity: number;
+}
+
 export interface ProductsResponse {
   data: Product[];
   limit: number;

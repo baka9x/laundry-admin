@@ -148,7 +148,6 @@ export default function CreateProductDialog({
           />
 
           <label className="block mb-1 mt-2 text-sm">Chọn đơn vị</label>
-
           <select
             value={newProduct.unit}
             onChange={(e) =>

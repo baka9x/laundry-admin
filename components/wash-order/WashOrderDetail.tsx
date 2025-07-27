@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Dropdown from "../ui/DropDown";
 import { WashOrder, WashOrdersResponse } from "@/types/washOrder";
 import { getWashOrders, updateWashOrderStatus } from "@/services/washOrder";
