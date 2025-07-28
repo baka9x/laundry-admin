@@ -10,6 +10,7 @@ import UpdateProductDialog from "./UpdateProductDialog";
 import { Product, ProductsResponse } from "@/types/product";
 import { deleteProduct, getProducts } from "@/services/product";
 import { formatVND } from "@/lib/formatVND";
+import { IoIosAddCircle } from "react-icons/io";
 
 export default function ProductDetail() {
   const [items, setItems] = useState<ProductsResponse | null>(null);
@@ -78,11 +79,26 @@ export default function ProductDetail() {
                   Dịch vụ: {item.service?.name || "Không có"}
                 </p>
 
-                <p className="text-[#ababab] text-sm">
-                  {formatVND(item.price)} / {item.unit}
+                <p className="text-[#ababab] text-sm mb-1">
+                  Giá bán: {formatVND(item.price)} / {item.unit}
+                </p>
+                <p className="text-[#ababab] text-sm mb-1">
+                  Chi phí gốc: 0 đ
+                </p>
+                <p className="text-[#ababab] text-sm mb-1">
+                  Nguyên liệu: Ly (1), Ống hút (1), Cà phê (40g), Sữa tươi (40ml)
                 </p>
 
                 <div className="flex justify-end gap-2 mt-2">
+                  <button
+                    onClick={() => {
+                      console.log("Click Add Material");
+                    }}
+                    className="text-yellow-300 hover:text-[#333] bg-amber-800 hover:bg-amber-600 flex-1 rounded-lg cursor-pointer flex items-center justify-center gap-2"
+                    title="Thêm nguyên liệu"
+                  >
+                    <IoIosAddCircle className="w-5 h-5" /> Thêm nguyên liệu
+                  </button>
                   <button
                     onClick={() => {
                       setSelectedProduct(item);

@@ -37,7 +37,7 @@ export interface CoffeeBlendInput {
 export interface CoffeeBlendBatchInput {
     blend_name: string,
     total_weight: number,
-    material_weights: Record<string, number>;
+    material_weights: { [key: number]: number };
 }
 
 export interface CoffeeBlendsResponse {

@@ -6,6 +6,7 @@ export interface Inventory {
     material_id: number;
     material: Material;
     total_quantity: number;
+    average_cost_per_unit: number;
     created_at: string;
     updated_at: string;
 }

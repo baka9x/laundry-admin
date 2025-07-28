@@ -1,395 +1,526 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laundry POS System</title>
+    <title>Quản Lý Kho Nguyên Liệu</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        .sidebar {
+            transition: all 0.3s ease;
         }
         @media (max-width: 768px) {
-            .pos-container {
-                flex-direction: column;
+            .sidebar {
+                transform: translateX(-100%);
+                position: absolute;
+                z-index: 50;
+                height: 100vh;
             }
-            .order-section, .products-section {
-                width: 100% !important;
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+            }
+            .overlay.active {
+                display: block;
             }
         }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
-    <div class="container mx-auto px-4 py-6">
-       
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-blue-800 text-white w-64 flex-shrink-0">
+            <div class="p-4 flex items-center justify-between border-b border-blue-700">
+                <h1 class="text-xl font-bold">Kho Nguyên Liệu</h1>
+                <button id="closeSidebar" class="md:hidden text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="p-4">
+                <ul>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-700">
+                            <i class="fas fa-tachometer-alt mr-3"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded bg-blue-700">
+                            <i class="fas fa-boxes mr-3"></i>
+                            <span>Quản lý nguyên liệu</span>
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-700">
+                            <i class="fas fa-exchange-alt mr-3"></i>
+                            <span>Nhập/Xuất kho</span>
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-700">
+                            <i class="fas fa-chart-bar mr-3"></i>
+                            <span>Báo cáo</span>
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-700">
+                            <i class="fas fa-cog mr-3"></i>
+                            <span>Cài đặt</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
 
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div class="flex pos-container">
-                <!-- Order Section -->
-                <div class="order-section w-2/5 border-r border-gray-200 bg-gray-50">
-                    <div class="p-4 border-b border-gray-200">
-                        <div class="flex justify-between items-center">
-                            <h2 class="text-xl font-semibold text-gray-800">Current Order</h2>
-                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">#ORD-001</span>
+        <!-- Overlay for mobile -->
+        <div id="overlay" class="overlay"></div>
+
+        <!-- Main content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="bg-white shadow-sm">
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex items-center">
+                        <button id="toggleSidebar" class="mr-4 text-gray-600 md:hidden">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h2 class="text-lg font-semibold text-gray-800">Quản lý nguyên liệu</h2>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input type="text" placeholder="Tìm kiếm..." class="pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                         </div>
-                        <div class="mt-4 flex space-x-2">
-                            <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition">
-                                <i class="fas fa-user mr-2"></i> Customer
+                        <div class="relative">
+                            <button class="text-gray-600 hover:text-gray-800">
+                                <i class="fas fa-bell"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
                             </button>
-                            <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-lg transition">
-                                <i class="fas fa-tags mr-2"></i> Discount
-                            </button>
+                        </div>
+                        <div class="flex items-center">
+                            <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User" class="h-8 w-8 rounded-full">
+                            <span class="ml-2 text-sm font-medium">Admin</span>
                         </div>
                     </div>
+                </div>
+            </header>
 
-                    <div class="p-4 border-b border-gray-200">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-gray-600">Items</span>
-                            <span class="text-gray-600">Qty</span>
-                        </div>
-                        <div class="order-items max-h-96 overflow-y-auto scrollbar-hide">
-                            <!-- Order items will be added here dynamically -->
-                            <div class="empty-state text-center py-10 text-gray-400">
-                                <i class="fas fa-tshirt text-4xl mb-2"></i>
-                                <p>No items added yet</p>
+            <!-- Main content area -->
+            <main class="flex-1 overflow-y-auto p-4 bg-gray-50">
+                <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2 md:mb-0">Danh sách nguyên liệu</h3>
+                    <div class="flex space-x-2">
+                        <button id="exportBtn" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                            <i class="fas fa-file-export mr-2"></i>Xuất Excel
+                        </button>
+                        <button id="addMaterialBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            <i class="fas fa-plus mr-2"></i>Thêm mới
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                                <i class="fas fa-box-open text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Tổng nguyên liệu</p>
+                                <h4 class="text-xl font-bold">128</h4>
                             </div>
                         </div>
                     </div>
-
-                    <div class="p-4 border-b border-gray-200">
-                        <div class="flex justify-between mb-1">
-                            <span class="text-gray-600">Subtotal</span>
-                            <span class="font-medium">$0.00</span>
-                        </div>
-                        <div class="flex justify-between mb-1">
-                            <span class="text-gray-600">Discount</span>
-                            <span class="font-medium">$0.00</span>
-                        </div>
-                        <div class="flex justify-between mb-1">
-                            <span class="text-gray-600">Tax</span>
-                            <span class="font-medium">$0.00</span>
-                        </div>
-                        <div class="flex justify-between mt-3 pt-3 border-t border-gray-200">
-                            <span class="text-lg font-semibold">Total</span>
-                            <span class="text-lg font-semibold text-blue-600">$0.00</span>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                                <i class="fas fa-check-circle text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Đủ định mức</p>
+                                <h4 class="text-xl font-bold">86</h4>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="p-4">
-                        <div class="grid grid-cols-2 gap-3">
-                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg transition font-medium">
-                                <i class="fas fa-trash-alt mr-2"></i> Clear
-                            </button>
-                            <button class="bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg transition font-medium">
-                                <i class="fas fa-check-circle mr-2"></i> Checkout
-                            </button>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                                <i class="fas fa-exclamation-triangle text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Sắp hết</p>
+                                <h4 class="text-xl font-bold">32</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-red-100 text-red-600 mr-4">
+                                <i class="fas fa-times-circle text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Hết hàng</p>
+                                <h4 class="text-xl font-bold">10</h4>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Products Section -->
-                <div class="products-section w-3/5">
-                    <div class="p-4 border-b border-gray-200">
-                        <div class="flex justify-between items-center">
-                            <h2 class="text-xl font-semibold text-gray-800">Laundry Services</h2>
-                            <div class="flex space-x-2">
-                                <button class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">All</button>
-                                <button class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">Wash</button>
-                                <button class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">Iron</button>
-                                <button class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">Dry Clean</button>
+                <!-- Material Table -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã NL</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên nguyên liệu</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Đơn vị</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Định mức</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">NL001</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Bột mì</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Kg</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">120.5</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">100.0</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đủ</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button class="text-blue-600 hover:text-blue-900 mr-3 edit-btn"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-900 delete-btn"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">NL002</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Đường trắng</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Kg</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">85.0</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">100.0</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Sắp hết</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button class="text-blue-600 hover:text-blue-900 mr-3 edit-btn"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-900 delete-btn"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">NL003</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Trứng gà</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Quả</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">250</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">300</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Sắp hết</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button class="text-blue-600 hover:text-blue-900 mr-3 edit-btn"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-900 delete-btn"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">NL004</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Sữa tươi</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Lít</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">0.0</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">20.0</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Hết</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button class="text-blue-600 hover:text-blue-900 mr-3 edit-btn"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-900 delete-btn"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                        <div class="flex-1 flex justify-between sm:hidden">
+                            <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"> Trước </a>
+                            <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"> Sau </a>
+                        </div>
+                        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm text-gray-700">
+                                    Hiển thị
+                                    <span class="font-medium">1</span>
+                                    đến
+                                    <span class="font-medium">4</span>
+                                    của
+                                    <span class="font-medium">128</span>
+                                    kết quả
+                                </p>
+                            </div>
+                            <div>
+                                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <span class="sr-only">Trước</span>
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                    <a href="#" aria-current="page" class="z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"> 1 </a>
+                                    <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"> 2 </a>
+                                    <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"> 3 </a>
+                                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <span class="sr-only">Sau</span>
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </nav>
                             </div>
                         </div>
                     </div>
+                </div>
+            </main>
+        </div>
+    </div>
 
-                    <div class="p-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 product-list">
-                            <!-- Product 1 -->
-                            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer product-item" data-id="1" data-name="Regular Wash" data-price="5.00">
-                                <div class="p-4">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-semibold text-gray-800">Regular Wash</h3>
-                                            <p class="text-sm text-gray-500">Basic washing service</p>
+    <!-- Add/Edit Material Modal -->
+    <div id="materialModal" class="fixed inset-0 overflow-y-auto hidden z-50">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-box text-blue-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle">Thêm nguyên liệu mới</h3>
+                            <div class="mt-4">
+                                <form id="materialForm">
+                                    <div class="grid grid-cols-1 gap-y-4 gap-x-6 sm:grid-cols-6">
+                                        <div class="sm:col-span-3">
+                                            <label for="materialCode" class="block text-sm font-medium text-gray-700">Mã nguyên liệu</label>
+                                            <input type="text" name="materialCode" id="materialCode" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                         </div>
-                                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">Wash</span>
-                                    </div>
-                                    <div class="mt-4 flex justify-between items-center">
-                                        <span class="text-lg font-semibold text-blue-600">$5.00</span>
-                                        <button class="add-to-order bg-blue-100 text-blue-800 p-2 rounded-full hover:bg-blue-200 transition">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Product 2 -->
-                            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer product-item" data-id="2" data-name="Express Wash" data-price="8.00">
-                                <div class="p-4">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-semibold text-gray-800">Express Wash</h3>
-                                            <p class="text-sm text-gray-500">Fast washing service</p>
+                                        <div class="sm:col-span-3">
+                                            <label for="materialName" class="block text-sm font-medium text-gray-700">Tên nguyên liệu</label>
+                                            <input type="text" name="materialName" id="materialName" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                         </div>
-                                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">Wash</span>
-                                    </div>
-                                    <div class="mt-4 flex justify-between items-center">
-                                        <span class="text-lg font-semibold text-blue-600">$8.00</span>
-                                        <button class="add-to-order bg-blue-100 text-blue-800 p-2 rounded-full hover:bg-blue-200 transition">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Product 3 -->
-                            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer product-item" data-id="3" data-name="Ironing" data-price="3.50">
-                                <div class="p-4">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-semibold text-gray-800">Ironing</h3>
-                                            <p class="text-sm text-gray-500">Professional ironing</p>
+                                        <div class="sm:col-span-3">
+                                            <label for="unit" class="block text-sm font-medium text-gray-700">Đơn vị tính</label>
+                                            <select id="unit" name="unit" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                                <option value="kg">Kg</option>
+                                                <option value="g">Gram</option>
+                                                <option value="l">Lít</option>
+                                                <option value="ml">Mili lít</option>
+                                                <option value="quả">Quả</option>
+                                                <option value="hộp">Hộp</option>
+                                                <option value="túi">Túi</option>
+                                            </select>
                                         </div>
-                                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Iron</span>
-                                    </div>
-                                    <div class="mt-4 flex justify-between items-center">
-                                        <span class="text-lg font-semibold text-blue-600">$3.50</span>
-                                        <button class="add-to-order bg-blue-100 text-blue-800 p-2 rounded-full hover:bg-blue-200 transition">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Product 4 -->
-                            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer product-item" data-id="4" data-name="Dry Cleaning" data-price="12.00">
-                                <div class="p-4">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-semibold text-gray-800">Dry Cleaning</h3>
-                                            <p class="text-sm text-gray-500">Delicate items</p>
+                                        <div class="sm:col-span-3">
+                                            <label for="quantity" class="block text-sm font-medium text-gray-700">Số lượng</label>
+                                            <input type="number" step="0.01" name="quantity" id="quantity" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                         </div>
-                                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">Dry Clean</span>
-                                    </div>
-                                    <div class="mt-4 flex justify-between items-center">
-                                        <span class="text-lg font-semibold text-blue-600">$12.00</span>
-                                        <button class="add-to-order bg-blue-100 text-blue-800 p-2 rounded-full hover:bg-blue-200 transition">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Product 5 -->
-                            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer product-item" data-id="5" data-name="Wash & Iron" data-price="7.50">
-                                <div class="p-4">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-semibold text-gray-800">Wash & Iron</h3>
-                                            <p class="text-sm text-gray-500">Complete service</p>
+                                        <div class="sm:col-span-3">
+                                            <label for="standard" class="block text-sm font-medium text-gray-700">Định mức</label>
+                                            <input type="number" step="0.01" name="standard" id="standard" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                         </div>
-                                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Combo</span>
-                                    </div>
-                                    <div class="mt-4 flex justify-between items-center">
-                                        <span class="text-lg font-semibold text-blue-600">$7.50</span>
-                                        <button class="add-to-order bg-blue-100 text-blue-800 p-2 rounded-full hover:bg-blue-200 transition">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Product 6 -->
-                            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer product-item" data-id="6" data-name="Blanket Cleaning" data-price="15.00">
-                                <div class="p-4">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-semibold text-gray-800">Blanket Cleaning</h3>
-                                            <p class="text-sm text-gray-500">Large items</p>
+                                        <div class="sm:col-span-3">
+                                            <label for="status" class="block text-sm font-medium text-gray-700">Trạng thái</label>
+                                            <select id="status" name="status" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                                <option value="1">Đủ</option>
+                                                <option value="2">Sắp hết</option>
+                                                <option value="3">Hết</option>
+                                            </select>
                                         </div>
-                                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">Dry Clean</span>
+                                        <div class="sm:col-span-6">
+                                            <label for="note" class="block text-sm font-medium text-gray-700">Ghi chú</label>
+                                            <textarea id="note" name="note" rows="3" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"></textarea>
+                                        </div>
                                     </div>
-                                    <div class="mt-4 flex justify-between items-center">
-                                        <span class="text-lg font-semibold text-blue-600">$15.00</span>
-                                        <button class="add-to-order bg-blue-100 text-blue-800 p-2 rounded-full hover:bg-blue-200 transition">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                                </form>
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="saveMaterialBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"> Lưu </button>
+                    <button type="button" id="cancelMaterialBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"> Hủy </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 overflow-y-auto hidden z-50">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-exclamation-triangle text-red-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Xóa nguyên liệu</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">Bạn có chắc chắn muốn xóa nguyên liệu này? Dữ liệu sẽ bị xóa vĩnh viễn và không thể khôi phục.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="confirmDeleteBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"> Xóa </button>
+                    <button type="button" id="cancelDeleteBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"> Hủy </button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const orderItemsContainer = document.querySelector('.order-items');
-            const productItems = document.querySelectorAll('.product-item');
-            const emptyState = document.querySelector('.empty-state');
-            let orderItems = [];
-            
-            // Add to order functionality
-            productItems.forEach(item => {
-                item.addEventListener('click', function(e) {
-                    // Check if the click was on the add button or its icon
-                    if (e.target.closest('.add-to-order') || e.target.classList.contains('fa-plus')) {
-                        const id = this.getAttribute('data-id');
-                        const name = this.getAttribute('data-name');
-                        const price = parseFloat(this.getAttribute('data-price'));
-                        
-                        addToOrder(id, name, price);
-                    }
-                });
-            });
-            
-            function addToOrder(id, name, price) {
-                // Check if item already exists in order
-                const existingItemIndex = orderItems.findIndex(item => item.id === id);
+        // Toggle sidebar on mobile
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        });
+
+        document.getElementById('closeSidebar').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        });
+
+        document.getElementById('overlay').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.remove('active');
+            this.classList.remove('active');
+        });
+
+        // Material modal handling
+        const materialModal = document.getElementById('materialModal');
+        const addMaterialBtn = document.getElementById('addMaterialBtn');
+        const saveMaterialBtn = document.getElementById('saveMaterialBtn');
+        const cancelMaterialBtn = document.getElementById('cancelMaterialBtn');
+        const materialForm = document.getElementById('materialForm');
+        const modalTitle = document.getElementById('modalTitle');
+
+        // Edit buttons
+        const editButtons = document.querySelectorAll('.edit-btn');
+        
+        // Delete modal handling
+        const deleteModal = document.getElementById('deleteModal');
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+        // Add new material
+        addMaterialBtn.addEventListener('click', function() {
+            modalTitle.textContent = 'Thêm nguyên liệu mới';
+            materialForm.reset();
+            materialModal.classList.remove('hidden');
+        });
+
+        // Edit material
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const row = this.closest('tr');
+                modalTitle.textContent = 'Chỉnh sửa nguyên liệu';
                 
-                if (existingItemIndex !== -1) {
-                    // Increment quantity if item exists
-                    orderItems[existingItemIndex].quantity += 1;
+                // Fill form with row data
+                document.getElementById('materialCode').value = row.cells[0].textContent;
+                document.getElementById('materialName').value = row.cells[1].textContent;
+                
+                // Set unit select
+                const unitSelect = document.getElementById('unit');
+                const unit = row.cells[2].textContent.toLowerCase();
+                for (let i = 0; i < unitSelect.options.length; i++) {
+                    if (unitSelect.options[i].value === unit) {
+                        unitSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+                
+                document.getElementById('quantity').value = row.cells[3].textContent;
+                document.getElementById('standard').value = row.cells[4].textContent;
+                
+                // Set status select based on badge
+                const statusSelect = document.getElementById('status');
+                const statusBadge = row.cells[5].querySelector('span');
+                if (statusBadge.classList.contains('bg-green-100')) {
+                    statusSelect.value = '1';
+                } else if (statusBadge.classList.contains('bg-yellow-100')) {
+                    statusSelect.value = '2';
                 } else {
-                    // Add new item to order
-                    orderItems.push({
-                        id,
-                        name,
-                        price,
-                        quantity: 1
-                    });
+                    statusSelect.value = '3';
                 }
                 
-                renderOrderItems();
-            }
-            
-            function renderOrderItems() {
-                if (orderItems.length === 0) {
-                    orderItemsContainer.innerHTML = `
-                        <div class="empty-state text-center py-10 text-gray-400">
-                            <i class="fas fa-tshirt text-4xl mb-2"></i>
-                            <p>No items added yet</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                let html = '';
-                let subtotal = 0;
-                
-                orderItems.forEach(item => {
-                    const itemTotal = item.price * item.quantity;
-                    subtotal += itemTotal;
-                    
-                    html += `
-                        <div class="order-item mb-3 pb-3 border-b border-gray-200 last:border-0 last:mb-0 last:pb-0">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <h4 class="font-medium text-gray-800">${item.name}</h4>
-                                    <span class="text-sm text-gray-500">$${item.price.toFixed(2)}</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <button class="decrease-quantity w-8 h-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center" data-id="${item.id}">
-                                        <i class="fas fa-minus text-xs"></i>
-                                    </button>
-                                    <span class="mx-2 w-8 text-center">${item.quantity}</span>
-                                    <button class="increase-quantity w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center" data-id="${item.id}">
-                                        <i class="fas fa-plus text-xs"></i>
-                                    </button>
-                                    <button class="remove-item ml-3 text-red-500 hover:text-red-700" data-id="${item.id}">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="mt-1 text-right text-sm font-medium">
-                                $${itemTotal.toFixed(2)}
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                orderItemsContainer.innerHTML = html;
-                
-                // Add event listeners to quantity buttons
-                document.querySelectorAll('.decrease-quantity').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const id = this.getAttribute('data-id');
-                        updateQuantity(id, -1);
-                    });
-                });
-                
-                document.querySelectorAll('.increase-quantity').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const id = this.getAttribute('data-id');
-                        updateQuantity(id, 1);
-                    });
-                });
-                
-                document.querySelectorAll('.remove-item').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const id = this.getAttribute('data-id');
-                        removeItem(id);
-                    });
-                });
-                
-                // Update totals
-                updateTotals(subtotal);
-            }
-            
-            function updateQuantity(id, change) {
-                const itemIndex = orderItems.findIndex(item => item.id === id);
-                
-                if (itemIndex !== -1) {
-                    orderItems[itemIndex].quantity += change;
-                    
-                    // Remove item if quantity reaches 0
-                    if (orderItems[itemIndex].quantity <= 0) {
-                        orderItems.splice(itemIndex, 1);
-                    }
-                    
-                    renderOrderItems();
-                }
-            }
-            
-            function removeItem(id) {
-                orderItems = orderItems.filter(item => item.id !== id);
-                renderOrderItems();
-            }
-            
-            function updateTotals(subtotal) {
-                const tax = subtotal * 0.1; // 10% tax for example
-                const total = subtotal + tax;
-                
-                // Update the totals display (you would need to add these elements to your HTML)
-                document.querySelector('.subtotal-display').textContent = `$${subtotal.toFixed(2)}`;
-                document.querySelector('.tax-display').textContent = `$${tax.toFixed(2)}`;
-                document.querySelector('.total-display').textContent = `$${total.toFixed(2)}`;
-            }
-            
-            // Clear order button functionality
-            document.querySelector('.clear-order').addEventListener('click', function() {
-                orderItems = [];
-                renderOrderItems();
+                materialModal.classList.remove('hidden');
             });
+        });
+
+        // Save material
+        saveMaterialBtn.addEventListener('click', function() {
+            // Here you would typically save to database
+            // For demo, we'll just close the modal
+            materialModal.classList.add('hidden');
             
-            // Checkout button functionality
-            document.querySelector('.checkout-order').addEventListener('click', function() {
-                if (orderItems.length === 0) {
-                    alert('Please add items to the order first.');
-                    return;
-                }
-                
-                // Here you would typically send the order to your backend
-                alert('Order processed successfully!');
-                orderItems = [];
-                renderOrderItems();
+            // Show success message
+            alert('Lưu thành công!');
+        });
+
+        // Cancel material form
+        cancelMaterialBtn.addEventListener('click', function() {
+            materialModal.classList.add('hidden');
+        });
+
+        // Delete material
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                deleteModal.classList.remove('hidden');
             });
+        });
+
+        // Confirm delete
+        confirmDeleteBtn.addEventListener('click', function() {
+            // Here you would typically delete from database
+            // For demo, we'll just close the modal
+            deleteModal.classList.add('hidden');
+            
+            // Show success message
+            alert('Xóa thành công!');
+        });
+
+        // Cancel delete
+        cancelDeleteBtn.addEventListener('click', function() {
+            deleteModal.classList.add('hidden');
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === materialModal) {
+                materialModal.classList.add('hidden');
+            }
+            if (event.target === deleteModal) {
+                deleteModal.classList.add('hidden');
+            }
+        });
+
+        // Export button
+        document.getElementById('exportBtn').addEventListener('click', function() {
+            alert('Xuất Excel thành công!');
         });
     </script>
 </body>
