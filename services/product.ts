@@ -1,4 +1,4 @@
-import { ProductInput, ProductsResponse } from "@/types/product";
+import { ProductInput, ProductsResponse, SellProductInput } from "@/types/product";
 import { api } from "./api";
 import { getServerToken, serverApi } from "./serverApi";
 
@@ -54,7 +54,7 @@ export const deleteProduct = async (isServer: boolean, productId: number) => {
 };
 
 
-export const sellProduct = async (isServer: false, input: ProductInput[]) => {
+export const sellProduct = async (isServer: false, input: SellProductInput) => {
   if (isServer) {
     await getServerToken();
     const response = await serverApi.post("/auth/products/sell", input);

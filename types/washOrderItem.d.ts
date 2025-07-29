@@ -5,6 +5,8 @@ export interface WashOrderItem {
   quantity: number;
   unit_price: number;
   subtotal: number;
+  unit_price_cost: number;
+  subtotal_cost: number;
   created_at: string;
   updated_at: string;
   product: {
@@ -24,4 +26,6 @@ export interface WashOrderItemInput {
   quantity: number;
   unit_price: number;
   subtotal: number;
+  unit_price_cost: number;
+  subtotal_cost: number;
 }

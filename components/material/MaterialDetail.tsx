@@ -76,17 +76,6 @@ export default function MaterialDetail() {
                 <p className="text-[#8ecae6] font-bold text-sm mb-2">Đơn vị: {item.unit}</p>
 
                 <div className="flex justify-end gap-2 mt-2">
-
-                  <button
-                    onClick={() => {
-                      router.push(`/materials/${item.id}`)
-                    }}
-                    className="text-yellow-300 hover:text-[#333] bg-amber-800 hover:bg-amber-600 flex-1 rounded-lg cursor-pointer flex items-center justify-center gap-2"
-                    title="Cập nhật kho"
-                  >
-                    <FaEdit className="w-5 h-5" /> Cập nhật kho
-                  </button>
-
                   <button
                     onClick={() => {
                       setSelectedMaterial(item);

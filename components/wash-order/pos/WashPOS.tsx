@@ -17,7 +17,7 @@ import { BiMinus, BiPlus } from "react-icons/bi";
 import { FaTrashAlt } from "react-icons/fa";
 import { ServicesResponse } from "@/types/service";
 import { getServices } from "@/services/service";
-import { getProducts } from "@/services/product";
+import { getProducts, sellProduct } from "@/services/product";
 import { formatVND } from "@/lib/formatVND";
 import InvoiceModal from "../InvoiceModal";
 import { createNotification } from "@/services/notification";
@@ -74,6 +74,11 @@ export default function WashPOS({ order, products }: Props) {
     [localItems]
   );
 
+  const subtotalCost = useMemo(
+    () => localItems.reduce((sum, item) => sum + item.subtotal_cost, 0),
+    [localItems]
+  );
+
   const discount = useMemo(
     () =>
       order.promotion
@@ -86,9 +91,23 @@ export default function WashPOS({ order, products }: Props) {
 
   const total = subtotal - discount;
 
+  const totalProfit = subtotal - discount - subtotalCost;
+
+  const calculateUnitPriceCost = (product: Product): number => {
+    if (!product.product_materials.length) return 0;
+    const totalCost = product.product_materials.reduce((sum, pm) => {
+      const costPerUnit =
+        pm.material_batch?.unit_price ??
+        0;
+      return sum + costPerUnit * pm.quantity_used;
+    }, 0);
+    return totalCost > 0 ? totalCost : product.price;
+  };
+
   const addItem = (product: Product) => {
     setLocalItems((prev) => {
       const existing = prev.find((item) => item.product_id === product.id);
+      const unitPriceCost = calculateUnitPriceCost(product);
       if (existing) {
         return prev.map((item) =>
           item.product_id === product.id
@@ -96,6 +115,8 @@ export default function WashPOS({ order, products }: Props) {
               ...item,
               quantity: item.quantity + 1,
               subtotal: (item.quantity + 1) * item.unit_price,
+              unit_price_cost: unitPriceCost,
+              subtotal_cost: (item.quantity + 1) * unitPriceCost,
             }
             : item
         );
@@ -109,6 +130,8 @@ export default function WashPOS({ order, products }: Props) {
           quantity: 1,
           unit_price: product.price,
           subtotal: product.price,
+          unit_price_cost: unitPriceCost,
+          subtotal_cost: unitPriceCost,
         },
       ];
     });
@@ -122,7 +145,12 @@ export default function WashPOS({ order, products }: Props) {
       setLocalItems((prev) =>
         prev.map((item) =>
           item.product_id === productId
-            ? { ...item, quantity: newQty, subtotal: newQty * item.unit_price }
+            ? {
+              ...item,
+              quantity: newQty,
+              subtotal: newQty * item.unit_price,
+              subtotal_cost: newQty * item.unit_price_cost,
+            }
             : item
         )
       );
@@ -139,7 +167,7 @@ export default function WashPOS({ order, products }: Props) {
 
   const handleCheckout = async () => {
     try {
-      if (order.total_amount > 0){
+      if (order.total_amount > 0) {
         // Xoa tat ca item product truoc khi tao lai don
         await deleteAllWashItemsByOrderID(false, order.id);
       }
@@ -150,14 +178,20 @@ export default function WashPOS({ order, products }: Props) {
           quantity: item.quantity,
           unit_price: item.unit_price,
           subtotal: item.subtotal,
+          unit_price_cost: item.unit_price_cost,
+          subtotal_cost: item.subtotal_cost,
+        });
+        await sellProduct(false, {
+          product_id: item.product_id,
+          quantity: item.quantity,
         });
       }
-      await updateWashOrderTotalPrice(order.id, total);
+      await updateWashOrderTotalPrice(order.id, total, totalProfit);
       await updateCustomerWashes(false, order.customer.id, total);
       toast.success("Đã tính tiền thành công!");
       setShowInvoice(true); // mở dialog
       // router.refresh(); // vẫn có thể refresh sau
-      
+
       await createNotification(false, {
         title: `Đơn hàng #${order.id} - ${order.customer.phone} (${order.customer.name}) đã tính tiền.`,
         content: `Đơn hàng #${order.id} - 
@@ -225,6 +259,9 @@ export default function WashPOS({ order, products }: Props) {
                           </h4>
                           <span className="text-sm text-yellow-500 font-bold tracking-wide">{item.unit_price.toLocaleString()} đ /{" "}
                             {item.product?.unit}</span>
+                          <span className="text-sm text-red-300 font-bold tracking-wide">
+                            Chi phí nguyên liệu: {formatVND(item.subtotal_cost)} ({formatVND(item.unit_price_cost)} đ / {item.product?.unit})
+                          </span>
                         </div>
                         <div className="flex items-center">
                           <button
@@ -285,6 +322,12 @@ export default function WashPOS({ order, products }: Props) {
                 <span className="text-lg font-semibold">Tổng</span>
                 <span className="text-lg font-semibold text-yellow-500">
                   {formatVND(total)}
+                </span>
+              </div>
+              <div className="flex justify-between mt-3 pt-3 border-t border-[#444]">
+                <span className="text-lg font-semibold">Lợi nhuận</span>
+                <span className="text-lg font-semibold text-yellow-500">
+                  {formatVND(totalProfit)}
                 </span>
               </div>
             </div>
@@ -353,7 +396,25 @@ export default function WashPOS({ order, products }: Props) {
                       <div className="flex justify-between items-start">
                         <div>
                           <h3 className="font-semibold">{product.name}</h3>
-                          <p className="text-sm text-gray-400">Mô tả ngắn</p>
+                          <p className="text-[#ababab] text-sm mb-3">
+                            Chi phí nguyên liệu:{" "}
+                            <span className="font-bold text-red-300">{product.product_materials.length > 0
+                              ? formatVND(product.product_materials
+                                .reduce(
+                                  (sum, pm) =>
+                                    sum + (pm.material_batch?.unit_price ?? 0) * pm.quantity_used,
+                                  0
+                                ))
+                              : "0 đ"}</span>
+                          </p>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[#ababab] text-sm">
+                            {product.product_materials.length > 0 && product.product_materials.map((pm, index) => (
+                              <span className="bg-[#444] px-2 py-1 mr-2 rounded-lg border" key={index}>
+                                {pm.material_batch?.material.name} ({formatVND((pm.material_batch?.unit_price ?? 0) * pm.quantity_used)} /{pm.quantity_used} {pm.material_batch?.material.unit})</span>
+                            ))}
+                          </div>
+
                         </div>
                         <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
                           {product.unit}

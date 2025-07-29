@@ -24,7 +24,6 @@ export default function InventoryDetail() {
   const [showUpdateMaterialDialog, setShowUpdateMaterialDialog] = useState(false);
   const [showAddBlendDialog, setShowAddBlendDialog] = useState(false);
   const [showUpdateBlendDialog, setShowUpdateBlendDialog] = useState(false);
-  const [showSellProductDialog, setShowSellProductDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Material | MaterialBatch | BlendInventory | null>(null);
   const [deleteType, setDeleteType] = useState<"material" | "blend" | null>(null);
@@ -97,12 +96,6 @@ export default function InventoryDetail() {
             className="flex items-center gap-1 bg-green-500 hover:bg-green-600 text-[#f5f5f5] font-semibold px-4 py-1 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out"
           >
             <IoAddCircle /> Thêm hỗn hợp
-          </button>
-          <button
-            onClick={() => setShowSellProductDialog(true)}
-            className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-[#f5f5f5] font-semibold px-4 py-1 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out"
-          >
-            <IoAddCircle /> Bán sản phẩm
           </button>
         </div>
       </div>
@@ -237,14 +230,6 @@ export default function InventoryDetail() {
           }}
         />
       )}
-      {/* <SellProductDialog
-        open={showSellProductDialog}
-        onClose={() => setShowSellProductDialog(false)}
-        onSell={() => {
-          fetchData();
-          setShowSellProductDialog(false);
-        }}
-      /> */}
       <Dialog
         open={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}

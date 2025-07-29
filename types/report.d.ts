@@ -1,6 +1,7 @@
 export interface ReportsResponse {
     data: {
         current_total: number,
+        current_total_profit: number,
         date: "today" | "this_week" | "this_month" | "custom" | string,
         start_date?: string,
         end_date?: string,

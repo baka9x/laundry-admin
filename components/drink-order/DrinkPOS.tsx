@@ -8,12 +8,14 @@ import { BiMinus, BiPlus } from "react-icons/bi";
 import { FaTrashAlt } from "react-icons/fa";
 import { ServicesResponse } from "@/types/service";
 import { getServices } from "@/services/service";
-import { getProducts } from "@/services/product";
+import { getProducts, sellProduct } from "@/services/product";
 import { formatVND } from "@/lib/formatVND";
 import InvoiceModal from "./InvoiceModal";
 import { createDrinkOrderItem } from "@/services/drinkOrderItem";
 import { createDrinkOrder, getDrinkOrderByID } from "@/services/drinkOrder";
 import { DrinkOrderDetailResponse } from "@/types/drinkOrder";
+import { BlendInventory } from "@/types/inventory";
+import { getBlendInventories } from "@/services/inventory";
 
 interface Props {
   products: Product[];
@@ -34,10 +36,27 @@ export default function DrinkPOS({ products }: Props) {
   const [selectedPromotion, setSelectedPromotion] = useState<number | null>(
     null
   );
-
+  const [blendInventories, setBendInventories] = useState<BlendInventory[] | null>(null);
+  const [loading, setLoading] = useState(false);
   // const [showCustomerDialog, setShowCustomerDialog] = useState(false);
   // const [showPromotionDialog, setShowPromotionDialog] = useState(false);
-
+  const fetchBlendInventories = async () => {
+    setLoading(true);
+    try {
+      const res = await getBlendInventories(false, {
+        limit: 100
+      })
+      if (!res || !res.data) {
+        toast.error("Không có dữ liệu kho");
+        return;
+      }
+      setBendInventories(res.data);
+    } catch (error) {
+      console.error("Error fetching blend inventories:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
   const fetchProductsByService = async (serviceId: number | null) => {
     try {
       const res = await getProducts(false, {
@@ -67,7 +86,6 @@ export default function DrinkPOS({ products }: Props) {
   const fetchCurrentOrder = async (id: number) => {
     try {
       const res = await getDrinkOrderByID(false, id); // Thay bằng ID thực tế
-      console.log(res);
       if (res) {
         setOrder(res);
         setSelectedCustomer(res.customer ? res.customer.id : null);
@@ -81,10 +99,16 @@ export default function DrinkPOS({ products }: Props) {
 
   useEffect(() => {
     fetchServices();
+    fetchBlendInventories();
   }, []);
 
   const subtotal = useMemo(
     () => localItems.reduce((sum, item) => sum + item.subtotal, 0),
+    [localItems]
+  );
+
+  const subtotalCost = useMemo(
+    () => localItems.reduce((sum, item) => sum + item.subtotal_cost, 0),
     [localItems]
   );
 
@@ -100,22 +124,42 @@ export default function DrinkPOS({ products }: Props) {
 
   const total = subtotal - discount;
 
+  const totalProfit = subtotal - discount - subtotalCost;
+
   const change = useMemo(() => {
     if (cashGiven === null) return 0;
     return Math.max(0, cashGiven - total);
   }, [cashGiven, total]);
 
+  const calculateUnitPriceCost = (product: Product): number => {
+    if (!product.product_materials.length || !blendInventories) return 0;
+    const totalCost = product.product_materials.reduce((sum, pm) => {
+      const blend = blendInventories.find((b) => b.blend_id === pm.blend_id);
+      const costPerUnit =
+        blend?.average_cost_per_unit ??
+        pm.coffee_blend?.average_cost_per_unit ??
+        pm.material_batch?.unit_price ??
+        0;
+      return sum + costPerUnit * pm.quantity_used;
+    }, 0);
+    // Assume unit_price_cost is total cost divided by an assumed yield (e.g., 1 unit of product)
+    return totalCost > 0 ? totalCost : product.price; // Fallback to selling price if no cost data
+  };
+
   const addItem = (product: Product) => {
     setLocalItems((prev) => {
       const existing = prev.find((item) => item.product_id === product.id);
+      const unitPriceCost = calculateUnitPriceCost(product);
       if (existing) {
         return prev.map((item) =>
           item.product_id === product.id
             ? {
-                ...item,
-                quantity: item.quantity + 1,
-                subtotal: (item.quantity + 1) * item.unit_price,
-              }
+              ...item,
+              quantity: item.quantity + 1,
+              subtotal: (item.quantity + 1) * item.unit_price,
+              unit_price_cost: unitPriceCost,
+              subtotal_cost: (item.quantity + 1) * unitPriceCost,
+            }
             : item
         );
       }
@@ -128,6 +172,8 @@ export default function DrinkPOS({ products }: Props) {
           quantity: 1,
           unit_price: product.price,
           subtotal: product.price,
+          unit_price_cost: unitPriceCost,
+          subtotal_cost: unitPriceCost,
         },
       ];
     });
@@ -141,7 +187,11 @@ export default function DrinkPOS({ products }: Props) {
       setLocalItems((prev) =>
         prev.map((item) =>
           item.product_id === productId
-            ? { ...item, quantity: newQty, subtotal: newQty * item.unit_price }
+            ? { ...item, 
+              quantity: newQty, 
+              subtotal: newQty * item.unit_price, 
+              subtotal_cost: newQty * item.unit_price_cost, 
+            }
             : item
         )
       );
@@ -167,6 +217,7 @@ export default function DrinkPOS({ products }: Props) {
         order_date: new Date(),
         customer_id: selectedCustomer || null,
         total_amount: total,
+        total_profit: totalProfit,
         promotion_id: selectedPromotion || null,
         status: "deliveried",
       });
@@ -183,6 +234,12 @@ export default function DrinkPOS({ products }: Props) {
             quantity: item.quantity,
             unit_price: item.unit_price,
             subtotal: item.subtotal,
+            unit_price_cost: item.unit_price_cost,
+            subtotal_cost: item.subtotal_cost,
+          });
+          await sellProduct(false, {
+            product_id: item.product_id,
+            quantity: item.quantity,
           });
         }
       } else {
@@ -262,6 +319,9 @@ export default function DrinkPOS({ products }: Props) {
                             {item.unit_price.toLocaleString()} đ /{" "}
                             {item.product?.unit}
                           </span>
+                          <span className="text-sm text-red-300 font-bold tracking-wide">
+                            Chi phí nguyên liệu: {formatVND(item.subtotal_cost)} ({formatVND(item.unit_price_cost)} đ / {item.product?.unit})
+                          </span>
                         </div>
                         <div className="flex items-center">
                           <button
@@ -325,6 +385,12 @@ export default function DrinkPOS({ products }: Props) {
                   {formatVND(total)}
                 </span>
               </div>
+              <div className="flex justify-between mt-3 pt-3 border-t border-[#444]">
+                <span className="text-lg font-semibold">Lợi nhuận</span>
+                <span className="text-lg font-semibold text-yellow-500">
+                  {formatVND(totalProfit)}
+                </span>
+              </div>
             </div>
 
             <div className="p-4 space-y-2">
@@ -344,9 +410,8 @@ export default function DrinkPOS({ products }: Props) {
               <div className="flex justify-between items-center text-lg font-semibold">
                 <span className="text-gray-400">Tiền thừa trả khách</span>
                 <span
-                  className={`font-bold ${
-                    change >= 0 ? "text-green-400" : "text-red-500"
-                  }`}
+                  className={`font-bold ${change >= 0 ? "text-green-400" : "text-red-500"
+                    }`}
                 >
                   {formatVND(change)}
                 </span>
@@ -386,11 +451,10 @@ export default function DrinkPOS({ products }: Props) {
                   <button
                     onClick={() => fetchProductsByService(null)}
                     className={`px-3 py-1 rounded-full text-sm font-medium 
-      ${
-        selectedServiceId === null
-          ? "bg-yellow-500 text-[#1f1f1f]"
-          : "bg-[#444] text-[#f5f5f5] hover:bg-[#555]"
-      }
+      ${selectedServiceId === null
+                        ? "bg-yellow-500 text-[#1f1f1f]"
+                        : "bg-[#444] text-[#f5f5f5] hover:bg-[#555]"
+                      }
     `}
                   >
                     Tất cả
@@ -401,11 +465,10 @@ export default function DrinkPOS({ products }: Props) {
                         key={service.id}
                         onClick={() => fetchProductsByService(service.id)}
                         className={`px-3 py-1 rounded-full text-sm font-medium 
-        ${
-          selectedServiceId === service.id
-            ? "bg-yellow-500 text-[#1f1f1f]"
-            : "bg-[#444] text-[#f5f5f5] hover:bg-[#555]"
-        }
+        ${selectedServiceId === service.id
+                            ? "bg-yellow-500 text-[#1f1f1f]"
+                            : "bg-[#444] text-[#f5f5f5] hover:bg-[#555]"
+                          }
       `}
                       >
                         {service.name}
@@ -427,7 +490,35 @@ export default function DrinkPOS({ products }: Props) {
                       <div className="flex justify-between items-start">
                         <div>
                           <h3 className="font-semibold">{product.name}</h3>
-                          <p className="text-sm text-gray-400">Mô tả ngắn</p>
+                          <p className="text-[#ababab] text-sm mb-3">
+                            Chi phí nguyên liệu:{" "}
+                            <span className="font-bold text-red-300">
+                              {product.product_materials.length > 0
+                                ? formatVND(
+                                  product.product_materials.reduce((sum, pm) => {
+                                    const blend = blendInventories?.find(b => b.blend_id === pm.blend_id);
+                                    return sum + (blend?.average_cost_per_unit ?? pm.coffee_blend?.average_cost_per_unit ?? pm.material_batch?.unit_price ?? 0) * pm.quantity_used;
+                                  }, 0)
+                                )
+                                : "0 đ"}
+                            </span>
+                          </p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[#ababab] text-sm">
+                            {product.product_materials.length > 0 &&
+                              product.product_materials.map((pm, index) => {
+                                // Find the blend inventory for the current blend_id
+                                const blend = blendInventories?.find(b => b.blend_id === pm.blend_id);
+                                return (
+                                  <span className="bg-[#444] px-2 py-1 rounded-lg border flex gap-2" key={index}>
+                                    {blend?.coffee_blend.name ?? pm.coffee_blend?.name ?? pm.material_batch?.material.name} (
+                                    {formatVND((blend?.average_cost_per_unit ?? pm.coffee_blend?.average_cost_per_unit ?? pm.material_batch?.unit_price ?? 0) * pm.quantity_used)} /
+                                    {pm.quantity_used} {blend?.coffee_blend.unit ?? pm.coffee_blend?.unit ?? pm.material_batch?.material.unit} 
+                                    {blend ? `/ ${pm.quantity_used * 2} ml`: ""} 
+                                    )
+                                  </span>
+                                );
+                              })}
+                          </div>
                         </div>
                         <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
                           {product.unit}

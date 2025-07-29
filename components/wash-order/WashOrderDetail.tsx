@@ -242,6 +242,12 @@ export default function WashOrderDetail() {
                   <div className="text-red-300 font-bold">
                     {formatVND(item.total_amount)}
                   </div>
+                  <div className="text-[#ababab] font-medium">
+                    Lợi nhuận tạm tính:
+                  </div>
+                  <div className="text-red-300 font-bold">
+                    {formatVND(item.total_profit)}
+                  </div>
                   {/* <div className="text-[#f5f5f5]">{item.note}</div> */}
                 </div>
 

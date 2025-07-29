@@ -52,9 +52,11 @@ export const updateWashOrderStatus = async (
 export const updateWashOrderTotalPrice = async (
   orderId: number,
   price: number,
+  profit: number,
 ) => {
   const response = await api.put(`/auth/wash-orders/${orderId}/price`, {
     price,
+    profit,
   })
   return response.data;
 };

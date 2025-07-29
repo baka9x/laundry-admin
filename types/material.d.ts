@@ -29,7 +29,7 @@ export interface ProductMaterial {
     material_batch: MaterialBatch | null;
     blend_id: number | null;
     coffee_blend: CoffeeBlend | null;
-    quantity: number;
+    quantity_used: number;
     created_at: string;
     updated_at: string;
 }

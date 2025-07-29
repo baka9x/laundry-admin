@@ -10,7 +10,6 @@ import UpdateProductDialog from "./UpdateProductDialog";
 import { Product, ProductsResponse } from "@/types/product";
 import { deleteProduct, getProducts } from "@/services/product";
 import { formatVND } from "@/lib/formatVND";
-import { IoIosAddCircle } from "react-icons/io";
 
 export default function ProductDetail() {
   const [items, setItems] = useState<ProductsResponse | null>(null);
@@ -80,25 +79,30 @@ export default function ProductDetail() {
                 </p>
 
                 <p className="text-[#ababab] text-sm mb-1">
-                 Giá bán: {formatVND(item.price)} / {item.unit}
-                </p>
-                <p className="text-[#ababab] text-sm mb-1">
-                 Chi phí gốc: 0 đ
-                </p>
-                <p className="text-[#ababab] text-sm mb-1">
-                 Nguyên liệu: Nước giặt (100ml), Nước Xả (50ml)
+                  Giá bán: <span className="font-bold text-green-300">{formatVND(item.price)} / {item.unit}</span>
                 </p>
 
+                <p className="text-[#ababab] text-sm mb-3">
+                  Chi phí nguyên liệu:{" "}
+                  <span className="font-bold text-red-300">{item.product_materials.length > 0
+                    ? formatVND(item.product_materials
+                      .reduce(
+                        (sum, pm) =>
+                          sum + (pm.material_batch?.unit_price ?? 0) * pm.quantity_used,
+                        0
+                      ))
+                    : "0 đ"}</span>
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[#ababab] text-sm">
+                  {item.product_materials.length > 0 && item.product_materials.map((pm, index) => (
+                    <span className="bg-[#444] px-2 py-1 mr-2 rounded-lg border" key={index}>
+                      {pm.material_batch?.material.name} ({formatVND((pm.material_batch?.unit_price ?? 0) * pm.quantity_used)} /{pm.quantity_used} {pm.material_batch?.material.unit})</span>
+                  ))}
+                </div>
+
                 <div className="flex justify-end gap-2 mt-2">
-                  <button
-                    onClick={() => {
-                      console.log("Click Add Material");
-                    }}
-                    className="text-yellow-300 hover:text-[#333] bg-amber-800 hover:bg-amber-600 flex-1 rounded-lg cursor-pointer flex items-center justify-center gap-2"
-                    title="Thêm nguyên liệu"
-                  >
-                    <IoIosAddCircle className="w-5 h-5" /> Thêm nguyên liệu
-                  </button>
+
                   <button
                     onClick={() => {
                       setSelectedProduct(item);

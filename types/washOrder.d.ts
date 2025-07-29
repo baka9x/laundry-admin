@@ -9,6 +9,7 @@ export interface WashOrder {
   order_date: string; // ISO datetime string
   pickup_time: string; // ISO datetime string
   total_amount: number;
+  total_profit: number;
   status:
     | "pending"
     | "progressing"
@@ -29,6 +30,7 @@ export interface WashOrderInput {
   order_date: Date;
   pickup_time?: Date | null;
   total_amount: number;
+  total_profit: number;
   promotion_id?: number | null;
 }
 
@@ -52,6 +54,7 @@ export interface WashOrderDetailResponse {
     | "cancelled"
     | string;
   total_amount: number;
+  total_profit: number;
   customer: {
     id: number;
     name: string;

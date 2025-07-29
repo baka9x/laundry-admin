@@ -10,7 +10,8 @@ import UpdateProductDialog from "./UpdateProductDialog";
 import { Product, ProductsResponse } from "@/types/product";
 import { deleteProduct, getProducts } from "@/services/product";
 import { formatVND } from "@/lib/formatVND";
-import { IoIosAddCircle } from "react-icons/io";
+import { BlendInventory } from "@/types/inventory";
+import { getBlendInventories } from "@/services/inventory";
 
 export default function ProductDetail() {
   const [items, setItems] = useState<ProductsResponse | null>(null);
@@ -18,24 +19,44 @@ export default function ProductDetail() {
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [blendInventories, setBendInventories] = useState<BlendInventory[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const limit = 100;
 
+  const fetchBlendInventories = async () => {
+    setLoading(true);
+    try {
+      const res = await getBlendInventories(false, {
+        limit: 100
+      })
+      if (!res || !res.data) {
+        toast.error("Không có dữ liệu sản phẩm");
+        return;
+      }
+      setBendInventories(res.data);
+    } catch (error) {
+      console.error("Error fetching blend inventories:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const data = await getProducts(false, {
+      const res = await getProducts(false, {
         type: "drink",
         page: page,
         limit: limit,
       });
-      if (!data || !data.data) {
+      if (!res || !res.data) {
         toast.error("Không có dữ liệu sản phẩm");
         return;
       }
-      console.log(data);
-      setItems(data);
+      setItems(res);
+
+      console.log(res);
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
@@ -44,6 +65,7 @@ export default function ProductDetail() {
   };
   useEffect(() => {
     fetchProducts();
+    fetchBlendInventories();
   }, [page]);
 
   return (
@@ -71,7 +93,7 @@ export default function ProductDetail() {
   transition-all duration-300 ease-in-out cursor-pointer"
               >
                 <h2 className="text-[#f5f5f5] text-lg font-semibold mb-1">
-                  {item.name}
+                  #{item.id}: {item.name}
                 </h2>
 
                 {/* Hiển thị tên dịch vụ */}
@@ -80,25 +102,37 @@ export default function ProductDetail() {
                 </p>
 
                 <p className="text-[#ababab] text-sm mb-1">
-                  Giá bán: {formatVND(item.price)} / {item.unit}
+                  Giá bán: <span className="font-bold text-green-300">{formatVND(item.price)} / {item.unit}</span>
                 </p>
-                <p className="text-[#ababab] text-sm mb-1">
-                  Chi phí gốc: 0 đ
+                <p className="text-[#ababab] text-sm mb-3">
+                  Chi phí nguyên liệu:{" "}
+                  <span className="font-bold text-red-300">
+                    {item.product_materials.length > 0
+                      ? formatVND(
+                        item.product_materials.reduce((sum, pm) => {
+                          const blend = blendInventories?.find(b => b.blend_id === pm.blend_id);
+                          return sum + (blend?.average_cost_per_unit ?? pm.coffee_blend?.average_cost_per_unit ?? pm.material_batch?.unit_price ?? 0) * pm.quantity_used;
+                        }, 0)
+                      )
+                      : "0 đ"}
+                  </span>
                 </p>
-                <p className="text-[#ababab] text-sm mb-1">
-                  Nguyên liệu: Ly (1), Ống hút (1), Cà phê (40g), Sữa tươi (40ml)
-                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[#ababab] text-sm">
+                  {item.product_materials.length > 0 &&
+                    item.product_materials.map((pm, index) => {
+                      // Find the blend inventory for the current blend_id
+                      const blend = blendInventories?.find(b => b.blend_id === pm.blend_id);
+                      return (
+                        <span className="bg-[#444] px-2 py-1 mr-2 rounded-lg border" key={index}>
+                          {blend?.coffee_blend.name ?? pm.coffee_blend?.name ?? pm.material_batch?.material.name} (
+                          {formatVND((blend?.average_cost_per_unit ?? pm.coffee_blend?.average_cost_per_unit ?? pm.material_batch?.unit_price ?? 0) * pm.quantity_used)} /
+                          {pm.quantity_used} {blend?.coffee_blend.unit ?? pm.coffee_blend?.unit ?? pm.material_batch?.material.unit})
+                        </span>
+                      );
+                    })}
+                </div>
 
                 <div className="flex justify-end gap-2 mt-2">
-                  <button
-                    onClick={() => {
-                      console.log("Click Add Material");
-                    }}
-                    className="text-yellow-300 hover:text-[#333] bg-amber-800 hover:bg-amber-600 flex-1 rounded-lg cursor-pointer flex items-center justify-center gap-2"
-                    title="Thêm nguyên liệu"
-                  >
-                    <IoIosAddCircle className="w-5 h-5" /> Thêm nguyên liệu
-                  </button>
                   <button
                     onClick={() => {
                       setSelectedProduct(item);

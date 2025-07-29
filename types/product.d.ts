@@ -1,4 +1,4 @@
-import { ProductMaterialInput } from "./material";
+import { ProductMaterial, ProductMaterialInput } from "./material";
 import Service from "./service";
 
 export interface Product {
@@ -10,6 +10,7 @@ export interface Product {
   unit: string;
   created_at: string;
   updated_at: string;
+  product_materials: ProductMaterial[];
 }
 
 export interface ProductInput {
@@ -18,6 +19,7 @@ export interface ProductInput {
   price: number;
   unit: string;
   product_materials: ProductMaterialInput[];
+  product_blends?: ProductMaterialInput[];
 }
 
 export interface SellProductInput {

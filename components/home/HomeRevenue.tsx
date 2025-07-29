@@ -15,6 +15,7 @@ export function HomeRevenue() {
         icon: <TbWashHand size={30} />,
         bgIcon: "bg-blue-600",
         number: 0,
+        number_profit: 0,
         orderNum: 0,
         orderUnit: "Đơn",
         footerNum: 0,
@@ -26,6 +27,7 @@ export function HomeRevenue() {
         icon: <IoMdCafe size={30} />,
         bgIcon: "bg-yellow-800",
         number: 0,
+        number_profit: 0,
         orderNum: 0,
         orderUnit: "Đơn",
         footerNum: 0,
@@ -33,7 +35,7 @@ export function HomeRevenue() {
     });
 
     const [thisMonthExpense, setThisMonthExpense] = useState<any>({
-        title: "CHI PHÍ THÁNG NÀY",
+        title: "CHI PHÍ CỐ ĐỊNH THÁNG NÀY",
         icon: <ImStatsDots size={30} />,
         bgIcon: "bg-red-800",
         number: 0,
@@ -63,6 +65,7 @@ export function HomeRevenue() {
             setRevenueWashOrders({
                 ...revenueWashOrders,
                 number: res.data.current_total,
+                number_profit: res.data.current_total_profit,
                 orderNum: res.data.order_num,
                 footerNum: res.data.percentage_change
             })
@@ -81,6 +84,7 @@ export function HomeRevenue() {
             setRevenueDrinkOrders({
                 ...revenueDrinkOrders,
                 number: res.data.current_total,
+                number_profit: res.data.current_total_profit,
                 orderNum: res.data.order_num,
                 footerNum: res.data.percentage_change
             })

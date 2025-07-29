@@ -5,6 +5,8 @@ export interface DrinkOrderItem {
   quantity: number;
   unit_price: number;
   subtotal: number;
+  unit_price_cost: number;
+  subtotal_cost: number;
   created_at: string;
   updated_at: string;
   product: {
@@ -24,6 +26,8 @@ export interface DrinkOrderItemInput {
   quantity: number;
   unit_price: number;
   subtotal: number;
+  unit_price_cost: number;
+  subtotal_cost: number;
 }
 
 export interface TopDrinkOrderItemsResponse {

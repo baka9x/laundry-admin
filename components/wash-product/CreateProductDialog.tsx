@@ -245,11 +245,11 @@ export default function CreateProductDialog({
             <p className="text-red-400 text-sm">Không có lô nguyên liệu nào</p>
           ) : (
             materialInputs.map((item, index) => (
-              <div key={index} className="flex gap-2 mt-2 items-center">
+              <div key={index} className="flex gap-2 items-center mb-2">
                 <select
                   value={item.batch_id ?? 0}
                   onChange={(e) => handleMaterialChange(index, "batch_id", e.target.value)}
-                  className="flex-1 px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
+                  className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
                   required
                 >
                   <option value={0} disabled>
@@ -267,7 +267,7 @@ export default function CreateProductDialog({
                   placeholder="Số lượng"
                   value={item.quantity_used}
                   onChange={(e) => handleMaterialChange(index, "quantity_used", e.target.value)}
-                  className="flex-1 px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
+                  className="w-full px-3 py-1.5 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
                   required
                 />
                 {materialInputs.length > 1 && (

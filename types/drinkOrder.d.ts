@@ -8,6 +8,7 @@ export interface DrinkOrder {
   user_name: string;
   order_date: string; // ISO datetime string
   total_amount: number;
+  total_profit: number;
   status:
   | "pending"
   | "progressing"
@@ -25,6 +26,7 @@ export interface DrinkOrderInput {
   user_id: number;
   order_date: Date;
   total_amount: number;
+  total_profit: number;
   promotion_id?: number | null;
   status?: "pending" | "progressing" | "completed" | "deliveried" | "cancelled" | string;
 }
@@ -48,6 +50,7 @@ export interface DrinkOrderDetailResponse {
   | "cancelled"
   | string;
   total_amount: number;
+  total_profit: number;
   customer: Customer;
   user: User;
   promotion: Promotion | null;

@@ -13,7 +13,7 @@ export const createCoffeeBlendBatch = async (isServer: false, input: CoffeeBlend
   }
 };
 
-export const getCoffeeBlendBatchs = async (
+export const getCoffeeBlendBatches = async (
   isServer = false,
   params: {page?: number; limit?: number }
 ): Promise<CoffeeBlendBatchesResponse> => {
