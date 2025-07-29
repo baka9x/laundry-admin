@@ -1,3 +1,4 @@
+import { ProductMaterialInput } from "./material";
 import Service from "./service";
 
 export interface Product {
@@ -16,6 +17,7 @@ export interface ProductInput {
   name: string;
   price: number;
   unit: string;
+  product_materials: ProductMaterialInput[];
 }
 
 export interface SellProductInput {

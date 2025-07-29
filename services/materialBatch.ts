@@ -14,7 +14,7 @@ export const createMaterialBatch = async (isServer: false, input: MaterialBatchI
   }
 };
 
-export const getMaterialBatchs = async (
+export const getMaterialBatches = async (
   isServer = false,
   params: {page?: number; limit?: number }
 ): Promise<MaterialBatchesResponse> => {

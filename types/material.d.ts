@@ -48,10 +48,10 @@ export interface MaterialBatchInput {
 }
 
 export interface ProductMaterialInput {
-    product_id: number;
+    product_id?: number;
     batch_id?: number | null;
     blend_id?: number | null;
-    quantity: number;
+    quantity_used: number;
 }
 
 export interface MaterialsResponse {

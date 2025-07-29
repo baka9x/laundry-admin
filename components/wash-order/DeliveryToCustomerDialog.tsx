@@ -23,7 +23,7 @@ export default function CreateOrderDialog({
   onDelivery,
 }: DeliveryToCustomerDialogProps) {
   const [cashGiven, setCashGiven] = useState<number | null>(null);
- 
+  
   const change = useMemo(() => {
     if (cashGiven === null) return 0;
     return Math.max(0, cashGiven - washOrder.total_amount);
