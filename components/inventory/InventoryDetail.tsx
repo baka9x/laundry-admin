@@ -29,7 +29,7 @@ export default function InventoryDetail() {
   const [deleteType, setDeleteType] = useState<"material" | "blend" | null>(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const limit = 12;
+  const limit = 999;
 
   const fetchData = async () => {
     setLoading(true);
@@ -106,19 +106,17 @@ export default function InventoryDetail() {
           {inventories && inventories.data.map((inventory) => (
             <div
               key={inventory.material_id}
-              className={`bg-[#1f1f1f] p-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.03] hover:-translate-y-1 transition-all duration-300 ease-in-out ${
-                inventory.total_quantity < 10 ? "border-2 border-red-500" : ""
-              }`}
+              className={`bg-[#1f1f1f] p-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.03] hover:-translate-y-1 transition-all duration-300 ease-in-out ${inventory.total_quantity < 10 ? "border-2 border-red-500" : ""
+                }`}
             >
-              <h2 className="text-[#f5f5f5] text-lg font-semibold mb-2">
-                {inventory.material.name}
+              <h2 className="text-[#f5f5f5] text-lg font-bold mb-2 flex items-center">
+                <span className="bg-[#f6b100] text-[#1e1e1e] text-sm font-bold px-3 py-1 rounded-full shadow mr-2">#{inventory.id}</span>{inventory.material.name}
               </h2>
-              <p className={`font-bold text-sm mb-2 ${
-                inventory.total_quantity < 10 ? "text-red-400" : "text-[#8ecae6]"
-              }`}>
+              <p className={`font-bold text-sm mb-2 ${inventory.total_quantity < 10 ? "text-red-400" : "text-[#8ecae6]"
+                }`}>
                 Tồn kho: {inventory.total_quantity} {inventory.material.unit}
               </p>
-               <p className="text-[#8ecae6] text-sm mb-2">
+              <p className="text-[#8ecae6] text-sm mb-2">
                 Giá trung bình: {formatVND(inventory.average_cost_per_unit)} / {inventory.material.unit}
               </p>
               <div className="flex justify-end gap-2 mt-2">
@@ -149,16 +147,14 @@ export default function InventoryDetail() {
           {blendInventories && blendInventories.data.map((blendInventory) => (
             <div
               key={blendInventory.blend_id}
-              className={`bg-[#1f1f1f] p-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.03] hover:-translate-y-1 transition-all duration-300 ease-in-out ${
-                blendInventory.total_quantity < 5 ? "border-2 border-red-500" : ""
-              }`}
+              className={`bg-[#1f1f1f] p-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.03] hover:-translate-y-1 transition-all duration-300 ease-in-out ${blendInventory.total_quantity < 5 ? "border-2 border-red-500" : ""
+                }`}
             >
-              <h2 className="text-[#f5f5f5] text-lg font-semibold mb-2">
-                #{blendInventory.coffee_blend.id} {blendInventory.coffee_blend.name}
+              <h2 className="text-amber-300 text-lg font-bold mb-2 flex items-center">
+                <span className="bg-[#f6b100] text-[#1e1e1e] text-sm font-bold px-3 py-1 rounded-full shadow mr-2">#{blendInventory.coffee_blend.id}</span>{blendInventory.coffee_blend.name}
               </h2>
-              <p className={`font-bold text-sm mb-2 ${
-                blendInventory.total_quantity < 5 ? "text-red-400" : "text-[#8ecae6]"
-              }`}>
+              <p className={`font-bold text-sm mb-2 ${blendInventory.total_quantity < 5 ? "text-red-400" : "text-[#8ecae6]"
+                }`}>
                 Tồn kho: {blendInventory.total_quantity} {blendInventory.coffee_blend.unit}
               </p>
               <p className="text-[#8ecae6] text-sm mb-2">

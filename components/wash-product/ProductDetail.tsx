@@ -69,10 +69,9 @@ export default function ProductDetail() {
   hover:shadow-lg hover:scale-[1.03] hover:-translate-y-1 
   transition-all duration-300 ease-in-out cursor-pointer"
               >
-                <h2 className="text-[#f5f5f5] text-lg font-semibold mb-1">
-                  {item.name}
+                <h2 className="text-[#f5f5f5] text-lg font-bold mb-2 flex items-center tracking-wide">
+                  <span className="bg-[#f6b100] text-[#1e1e1e] text-sm font-bold px-3 py-1 rounded-full shadow mr-2">#{item.id}</span>{item.name}
                 </h2>
-
                 {/* Hiển thị tên dịch vụ */}
                 <p className="text-[#8ecae6] text-xs mb-1">
                   Dịch vụ: {item.service?.name || "Không có"}

@@ -168,7 +168,7 @@ export default function CreateBlendDialog({ open, onClose, onAdd }: CreateBlendD
                   <select
                     value={item.material_id}
                     onChange={(e) => handleMaterialChange(index, "material_id", e.target.value)}
-                    className="flex-1 px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
+                    className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
                     required
                   >
                     <option value="0" disabled>
@@ -186,7 +186,7 @@ export default function CreateBlendDialog({ open, onClose, onAdd }: CreateBlendD
                     placeholder="Trọng lượng (g)"
                     value={item.weight}
                     onChange={(e) => handleMaterialChange(index, "weight", e.target.value)}
-                    className="flex-1 px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
+                    className="w-full px-3 py-2 rounded bg-[#1f1f1f] text-[#f5f5f5] border border-[#444] focus:outline-none"
                     required
                   />
                   {materialWeights.length > 1 && (

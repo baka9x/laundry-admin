@@ -181,6 +181,7 @@ export default function CreateOrderDialog({
         pickup_time: formattedPickupTime,
         total_amount: totalAmount,
         promotion_id: selectedPromotion ?? null,
+        total_profit: 0,
       });
       handleAddNotification({
         id: res.order_id,

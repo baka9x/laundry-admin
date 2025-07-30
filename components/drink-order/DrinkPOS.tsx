@@ -187,10 +187,11 @@ export default function DrinkPOS({ products }: Props) {
       setLocalItems((prev) =>
         prev.map((item) =>
           item.product_id === productId
-            ? { ...item, 
-              quantity: newQty, 
-              subtotal: newQty * item.unit_price, 
-              subtotal_cost: newQty * item.unit_price_cost, 
+            ? {
+              ...item,
+              quantity: newQty,
+              subtotal: newQty * item.unit_price,
+              subtotal_cost: newQty * item.unit_price_cost,
             }
             : item
         )
@@ -258,7 +259,7 @@ export default function DrinkPOS({ products }: Props) {
       // });
     } catch (e) {
       console.error(e);
-      toast.error("Thêm sản phẩm thất bại!");
+      toast.error("Thanh toán thất bại. Có thể đã hết nguyên liệu cần kiểm tra!");
     }
   };
 
@@ -429,8 +430,7 @@ export default function DrinkPOS({ products }: Props) {
                 <button
                   onClick={handleCheckout}
                   disabled={
-                    localItems.length === 0 ||
-                    (cashGiven !== null && cashGiven < total)
+                    localItems.length === 0
                   }
                   className="bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg transition font-medium"
                 >
@@ -512,8 +512,8 @@ export default function DrinkPOS({ products }: Props) {
                                   <span className="bg-[#444] px-2 py-1 rounded-lg border flex gap-2" key={index}>
                                     {blend?.coffee_blend.name ?? pm.coffee_blend?.name ?? pm.material_batch?.material.name} (
                                     {formatVND((blend?.average_cost_per_unit ?? pm.coffee_blend?.average_cost_per_unit ?? pm.material_batch?.unit_price ?? 0) * pm.quantity_used)} /
-                                    {pm.quantity_used} {blend?.coffee_blend.unit ?? pm.coffee_blend?.unit ?? pm.material_batch?.material.unit} 
-                                    {blend ? `/ ${pm.quantity_used * 2} ml`: ""} 
+                                    {pm.quantity_used} {blend?.coffee_blend.unit ?? pm.coffee_blend?.unit ?? pm.material_batch?.material.unit}
+                                    {blend ? `/ ${pm.quantity_used * 2} ml` : ""}
                                     )
                                   </span>
                                 );

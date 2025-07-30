@@ -69,8 +69,8 @@ export default function CustomerDetail() {
                 hover:shadow-lg hover:scale-[1.03] hover:-translate-y-1 
                 transition-all duration-300 ease-in-out cursor-pointer"
               >
-                <h2 className="text-[#f5f5f5] text-lg font-semibold mb-2">
-                  {item.phone} ({item.name})
+                <h2 className="text-amber-300 text-lg font-bold mb-2 flex items-center">
+                  <span className="bg-[#f6b100] text-[#1e1e1e] text-sm font-bold px-3 py-1 rounded-full shadow mr-2">#{item.id}</span>{item.phone} ({item.name})
                 </h2>
                 <div className="grid grid-cols-2 gap-y-2 text-sm max-w-md">
                   <div className="text-[#ababab] font-medium">Địa chỉ:</div>

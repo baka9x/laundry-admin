@@ -15,7 +15,7 @@ export function HomeRevenue() {
         icon: <TbWashHand size={30} />,
         bgIcon: "bg-blue-600",
         number: 0,
-        number_profit: 0,
+        numberProfit: 0,
         orderNum: 0,
         orderUnit: "Đơn",
         footerNum: 0,
@@ -27,7 +27,7 @@ export function HomeRevenue() {
         icon: <IoMdCafe size={30} />,
         bgIcon: "bg-yellow-800",
         number: 0,
-        number_profit: 0,
+        numberProfit: 0,
         orderNum: 0,
         orderUnit: "Đơn",
         footerNum: 0,
@@ -35,12 +35,15 @@ export function HomeRevenue() {
     });
 
     const [thisMonthExpense, setThisMonthExpense] = useState<any>({
-        title: "CHI PHÍ CỐ ĐỊNH THÁNG NÀY",
+        title: "CHI PHÍ THÁNG NÀY",
         icon: <ImStatsDots size={30} />,
         bgIcon: "bg-red-800",
         number: 0,
+        materialBatchTotal: 0,
         orderNum: 0,
+        materialBatchNum: 0,
         orderUnit: "Đơn",
+        materialBatchUnit: "Lô",
         footerNum: 0,
         compareText: "tháng trước"
     });
@@ -58,14 +61,14 @@ export function HomeRevenue() {
 
     const fetchRevenueWashOrders = async () => {
         try {
-            const res = await countRevenueAndCompareWashOrders(false, {})
+            const res = await countRevenueAndCompareWashOrders(false, {date: "today"})
             if (!res) {
                 return;
             }
             setRevenueWashOrders({
                 ...revenueWashOrders,
                 number: res.data.current_total,
-                number_profit: res.data.current_total_profit,
+                numberProfit: res.data.current_total_profit,
                 orderNum: res.data.order_num,
                 footerNum: res.data.percentage_change
             })
@@ -77,14 +80,14 @@ export function HomeRevenue() {
 
     const fetchRevenueDrinkOrders = async () => {
         try {
-            const res = await countRevenueAndCompareDrinkOrders(false, {})
+            const res = await countRevenueAndCompareDrinkOrders(false, {date: "today"})
             if (!res) {
                 return;
             }
             setRevenueDrinkOrders({
                 ...revenueDrinkOrders,
                 number: res.data.current_total,
-                number_profit: res.data.current_total_profit,
+                numberProfit: res.data.current_total_profit,
                 orderNum: res.data.order_num,
                 footerNum: res.data.percentage_change
             })
@@ -96,14 +99,16 @@ export function HomeRevenue() {
 
     const fetchExpenses = async () => {
         try {
-            const res = await countExpensesAndCompare(false, {})
+            const res = await countExpensesAndCompare(false, {date: "this_month"})
             if (!res) {
                 return;
             }
             setThisMonthExpense({
                 ...thisMonthExpense,
                 number: res.data.current_total,
+                materialBatchTotal: res.data.current_material_batch_total,
                 orderNum: res.data.order_num,
+                materialBatchNum: res.data.material_batch_num,
                 footerNum: res.data.percentage_change
             })
         } catch (error) {
@@ -113,7 +118,7 @@ export function HomeRevenue() {
 
     const fetchProfit = async () => {
         try {
-            const res = await countProfitAndCompare(false, {})
+            const res = await countProfitAndCompare(false, {date: "this_month"})
             if (!res) {
                 return;
             }
